@@ -1,0 +1,5 @@
+{
+  "name": "IonicMaster",
+  "description": "An interactive educational game for students to master ionic compound naming and formation. Features adaptive difficulty levels and an AI tutor powered by Gemini to explain concepts and provide feedback.",
+  "requestFramePermissions": []
+}
