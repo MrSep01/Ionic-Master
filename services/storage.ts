@@ -1,5 +1,5 @@
 
-import { GameState, DifficultyLevel } from '../types';
+import { GameState, DifficultyLevel, HistoryEntry, CertificateEntry } from '../types';
 
 const STORAGE_KEY = 'ionic_master_save_v1';
 
@@ -10,16 +10,22 @@ export interface SavedProgress {
   unlockedLevels: DifficultyLevel[];
   levelWins: number;
   notes?: string;
+  history?: HistoryEntry[];
+  certificates?: CertificateEntry[];
+  hasSeenTutorial?: boolean;
 }
 
-export const saveProgress = (state: GameState) => {
+export const saveProgress = (state: GameState, hasSeenTutorial: boolean = false) => {
   const dataToSave: SavedProgress = {
     level: state.level,
     score: state.score,
     streak: state.streak,
     unlockedLevels: state.unlockedLevels,
     levelWins: state.levelWins,
-    notes: state.notes
+    notes: state.notes,
+    history: state.history,
+    certificates: state.certificates,
+    hasSeenTutorial: hasSeenTutorial
   };
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));

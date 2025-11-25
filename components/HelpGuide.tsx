@@ -1,0 +1,218 @@
+
+import React, { useState } from 'react';
+import { X, ArrowRight, ArrowLeft, Zap, Target, Shield, BookOpen, Crown, Microscope } from 'lucide-react';
+
+interface HelpGuideProps {
+  onClose: () => void;
+}
+
+const HelpGuide: React.FC<HelpGuideProps> = ({ onClose }) => {
+  const [step, setStep] = useState(0);
+
+  const steps = [
+    {
+      title: "PROTOCOL INITIATED",
+      subtitle: "Welcome to the Lab, Recruit",
+      icon: <Microscope className="w-16 h-16 text-emerald-500" />,
+      content: (
+        <>
+          <p className="mb-4">You have entered the <strong>IonicMaster Academy</strong>. Your goal is to rise from a Novice lab assistant to a legendary Grandmaster Chemist.</p>
+          <p>Your mission is simple: <strong>Synthesize stable compounds</strong> by combining dangerous ions into neutral, safe substances.</p>
+        </>
+      ),
+      theme: "emerald"
+    },
+    {
+      title: "MISSION PARAMETERS",
+      subtitle: "Analyze & Synthesize",
+      icon: <Target className="w-16 h-16 text-blue-500" />,
+      content: (
+        <>
+          <p className="mb-4"><strong>1. Identify the Target:</strong> Look at the compound name at the top (e.g., "Sodium Chloride").</p>
+          <p className="mb-4"><strong>2. Select Your Ions:</strong> Use the periodic table or polyatomic tabs to find the correct <strong>Cation (+)</strong> and <strong>Anion (-)</strong>.</p>
+          <p><strong>3. The Golden Rule:</strong> Nature loves balance. The total positive charge MUST equal the total negative charge.</p>
+        </>
+      ),
+      theme: "blue"
+    },
+    {
+      title: "STABILIZATION",
+      subtitle: "Balancing the Charges",
+      icon: <Zap className="w-16 h-16 text-amber-500" />,
+      content: (
+        <>
+          <div className="bg-amber-50 p-3 rounded-lg border border-amber-200 text-xs sm:text-sm font-mono text-amber-900 mb-4">
+            Example: Calcium (Ca²⁺) + Chloride (Cl⁻)
+          </div>
+          <p className="mb-2">A +2 charge needs two -1 charges to balance out.</p>
+          <p>Use the <span className="inline-block px-1.5 py-0.5 bg-slate-100 rounded border border-slate-300 font-bold">+</span> and <span className="inline-block px-1.5 py-0.5 bg-slate-100 rounded border border-slate-300 font-bold">-</span> buttons to adjust the amount of each ion until the <strong>Net Charge is 0</strong>.</p>
+        </>
+      ),
+      theme: "amber"
+    },
+    {
+      title: "CAREER PROGRESSION",
+      subtitle: "Earn Your Stripes",
+      icon: <Shield className="w-16 h-16 text-indigo-500" />,
+      content: (
+        <div className="space-y-3 text-left">
+          <div className="flex items-center gap-3">
+            <span className="px-2 py-1 bg-slate-100 rounded text-[10px] font-black uppercase">Lvl 1</span>
+            <span><strong>Novice:</strong> Simple ions. The basics.</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-[10px] font-black uppercase">Lvl 2</span>
+            <span><strong>Apprentice:</strong> Polyatomic groups introduced.</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-[10px] font-black uppercase">Lvl 3</span>
+            <span><strong>Master:</strong> Transition metals & variable charges.</span>
+          </div>
+          <p className="text-xs text-slate-400 mt-2 italic text-center">Win 5 challenges to unlock the next clearance level!</p>
+        </div>
+      ),
+      theme: "indigo"
+    },
+    {
+      title: "CLASSIFIED CLEARANCE",
+      subtitle: "The Grandmaster Level",
+      icon: <Crown className="w-16 h-16 text-rose-500 animate-pulse" />,
+      content: (
+        <>
+          <p className="mb-4">Only the elite reach <strong>Level 4: Grandmaster</strong>.</p>
+          <p className="mb-4">In this mode, the protocol reverses. We give you the <strong>Chemical Formula</strong> (e.g., Fe₂O₃), and YOU must identify the correct name.</p>
+          <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-800 font-bold text-sm">
+            Warning: Multiple choice logic required.
+          </div>
+        </>
+      ),
+      theme: "rose"
+    },
+    {
+      title: "FIELD EQUIPMENT",
+      subtitle: "Your Research Tools",
+      icon: <BookOpen className="w-16 h-16 text-cyan-500" />,
+      content: (
+        <>
+          <ul className="space-y-3 text-left">
+            <li className="flex gap-2">
+              <strong className="text-cyan-600">The Notebook:</strong> Automatically records every compound you synthesize. Use the "Notes" tab to type your own observations.
+            </li>
+            <li className="flex gap-2">
+              <strong className="text-purple-600">AI Tutor:</strong> Stuck? Click the Brain icon. Success? Read the Fun Fact generated by our AI core.
+            </li>
+            <li className="flex gap-2">
+              <strong className="text-amber-600">Certificates:</strong> Mastering a level grants a printable diploma. Collect them all!
+            </li>
+          </ul>
+        </>
+      ),
+      theme: "cyan"
+    }
+  ];
+
+  const handleNext = () => {
+    if (step < steps.length - 1) {
+      setStep(step + 1);
+    } else {
+      onClose();
+    }
+  };
+
+  const handlePrev = () => {
+    if (step > 0) {
+      setStep(step - 1);
+    }
+  };
+
+  const currentTheme = steps[step].theme;
+  
+  const getThemeClasses = (t: string) => {
+      switch(t) {
+          case 'emerald': return 'bg-emerald-500 shadow-emerald-200';
+          case 'blue': return 'bg-blue-500 shadow-blue-200';
+          case 'amber': return 'bg-amber-500 shadow-amber-200';
+          case 'indigo': return 'bg-indigo-500 shadow-indigo-200';
+          case 'rose': return 'bg-rose-500 shadow-rose-200';
+          case 'cyan': return 'bg-cyan-500 shadow-cyan-200';
+          default: return 'bg-slate-500 shadow-slate-200';
+      }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/90 backdrop-blur-md p-4 animate-in fade-in duration-300">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border-4 border-white ring-1 ring-slate-200 relative flex flex-col max-h-[90vh]">
+        
+        {/* Progress Bar */}
+        <div className="absolute top-0 left-0 w-full h-2 bg-slate-100">
+          <div 
+            className={`h-full transition-all duration-300 ${getThemeClasses(currentTheme).split(' ')[0]}`}
+            style={{ width: `${((step + 1) / steps.length) * 100}%` }}
+          ></div>
+        </div>
+
+        <button 
+          onClick={onClose}
+          className="absolute top-4 right-4 p-2 bg-slate-50 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition-colors z-10"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        <div className="flex-1 overflow-y-auto p-6 sm:p-10 text-center flex flex-col items-center">
+          
+          <div className={`shrink-0 mb-6 p-6 rounded-3xl bg-slate-50 ring-4 ring-white shadow-xl animate-in zoom-in duration-500 border-2 border-slate-100`}>
+             {steps[step].icon}
+          </div>
+
+          <h3 className={`text-xs font-black uppercase tracking-[0.2em] mb-2 ${
+              currentTheme === 'rose' ? 'text-rose-500' : 'text-slate-400'
+          }`}>
+            {steps[step].title}
+          </h3>
+
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-800 mb-6 tracking-tight">
+            {steps[step].subtitle}
+          </h2>
+
+          <div className="text-slate-600 leading-relaxed text-sm sm:text-base w-full">
+            {steps[step].content}
+          </div>
+
+        </div>
+
+        {/* Footer Actions */}
+        <div className="p-6 pt-2 bg-white border-t border-slate-100 flex items-center justify-between gap-4 mt-auto">
+             {step > 0 ? (
+                 <button 
+                    onClick={handlePrev}
+                    className="flex items-center gap-2 text-slate-400 hover:text-slate-600 font-bold text-sm px-4 py-2 hover:bg-slate-50 rounded-xl transition-colors"
+                 >
+                    <ArrowLeft className="w-4 h-4" /> Back
+                 </button>
+             ) : (
+                 <div className="w-20"></div> // Spacer
+             )}
+
+             <div className="flex gap-1.5">
+                 {steps.map((_, idx) => (
+                     <div 
+                        key={idx} 
+                        className={`w-2 h-2 rounded-full transition-colors ${idx === step ? 'bg-slate-800 scale-125' : 'bg-slate-200'}`}
+                     />
+                 ))}
+             </div>
+
+             <button 
+                onClick={handleNext}
+                className={`flex items-center gap-2 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all ${getThemeClasses(currentTheme)}`}
+             >
+                {step === steps.length - 1 ? "Start Mission" : "Next"}
+                {step !== steps.length - 1 && <ArrowRight className="w-4 h-4" />}
+             </button>
+          </div>
+      </div>
+    </div>
+  );
+};
+
+export default HelpGuide;

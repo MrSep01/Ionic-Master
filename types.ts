@@ -7,14 +7,16 @@ export enum IonType {
 export enum DifficultyLevel {
   NOVICE = 'Novice',
   APPRENTICE = 'Apprentice',
-  MASTER = 'Master'
+  MASTER = 'Master',
+  GRANDMASTER = 'Grandmaster'
 }
 
 // Helper to determine order
 export const LEVEL_ORDER = [
   DifficultyLevel.NOVICE,
   DifficultyLevel.APPRENTICE,
-  DifficultyLevel.MASTER
+  DifficultyLevel.MASTER,
+  DifficultyLevel.GRANDMASTER
 ];
 
 export interface Ion {
@@ -30,6 +32,24 @@ export interface Challenge {
   targetName: string;
   cation: Ion;
   anion: Ion;
+  cationOptions?: string[]; // Multiple choice options for GM level
+  anionOptions?: string[];  // Multiple choice options for GM level
+}
+
+export interface HistoryEntry {
+  id: string;
+  timestamp: number;
+  targetName: string;
+  cation: Ion;
+  anion: Ion;
+  cationCount: number;
+  anionCount: number;
+  funFact: string;
+}
+
+export interface CertificateEntry {
+  level: DifficultyLevel;
+  timestamp: number;
 }
 
 export interface GameState {
@@ -44,10 +64,12 @@ export interface GameState {
   gameStatus: 'playing' | 'success' | 'error';
   feedbackMessage: string;
   showTutor: boolean;
-  // New progression state
+  // Progression state
   unlockedLevels: DifficultyLevel[];
   levelWins: number; // Wins in the current level
   notes: string; // Student notebook content
+  history: HistoryEntry[]; // Log of synthesized compounds
+  certificates: CertificateEntry[]; // Earned certificates
 }
 
 // New types for the UI

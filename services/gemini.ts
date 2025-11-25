@@ -2,8 +2,12 @@ import { GoogleGenAI } from "@google/genai";
 import { Ion, DifficultyLevel } from '../types';
 
 // Initialize the client
-// NOTE: In a real production app, ensure your build system injects process.env.API_KEY
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+// Support both Node/Process env and Vite import.meta.env
+const apiKey = (typeof process !== 'undefined' && process.env?.API_KEY) 
+  ? process.env.API_KEY 
+  : (import.meta as any).env?.VITE_API_KEY || '';
+
+const ai = new GoogleGenAI({ apiKey });
 
 export const getAIFeedback = async (
   cation: Ion,

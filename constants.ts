@@ -31,7 +31,7 @@ export const CATIONS: Ion[] = [
   { symbol: 'Pb', name: 'Lead(IV)', charge: 4, type: IonType.CATION, elementSymbol: 'Pb' },
   { symbol: 'Sn', name: 'Tin(II)', charge: 2, type: IonType.CATION, elementSymbol: 'Sn' },
   { symbol: 'Sn', name: 'Tin(IV)', charge: 4, type: IonType.CATION, elementSymbol: 'Sn' },
-  { symbol: 'Hg2', name: 'Mercury(I)', charge: 2, type: IonType.CATION, isPolyatomic: true }, // Hg2 2+
+  { symbol: 'Hg2', name: 'Mercury(I)', charge: 2, type: IonType.CATION, isPolyatomic: true, elementSymbol: 'Hg' }, // Hg2 2+
   { symbol: 'Hg', name: 'Mercury(II)', charge: 2, type: IonType.CATION, elementSymbol: 'Hg' },
   { symbol: 'Mn', name: 'Manganese(II)', charge: 2, type: IonType.CATION, elementSymbol: 'Mn' },
   { symbol: 'Mn', name: 'Manganese(IV)', charge: 4, type: IonType.CATION, elementSymbol: 'Mn' },
@@ -193,6 +193,13 @@ export const LEVEL_CONFIG = {
   },
   [DifficultyLevel.MASTER]: {
     description: "Full access. Transition metals, variable charges, and complex polyatomics.",
+    ions: {
+      cations: CATIONS,
+      anions: ANIONS
+    }
+  },
+  [DifficultyLevel.GRANDMASTER]: {
+    description: "Nomenclature Challenge. Identify the compound name from its formula.",
     ions: {
       cations: CATIONS,
       anions: ANIONS

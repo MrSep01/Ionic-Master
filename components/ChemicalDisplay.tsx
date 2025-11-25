@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { formatCharge } from '../constants';
 
@@ -24,18 +25,20 @@ const ChemicalDisplay: React.FC<ChemicalDisplayProps> = ({
   const renderSymbol = (s: string) => {
     const parts = s.split(/(\d+)/);
     return parts.map((part, i) => 
-      /\d+/.test(part) ? <sub key={i} className="text-[0.6em] align-baseline relative top-[0.3em]">{part}</sub> : <span key={i}>{part}</span>
+      /\d+/.test(part) 
+        ? <sub key={i} className="text-[0.7em] align-sub">{part}</sub> 
+        : <span key={i}>{part}</span>
     );
   };
 
   return (
-    <span className={`inline-flex items-baseline leading-none ${className}`}>
+    <span className={`inline-block leading-normal ${className}`}>
       {count > 1 && isPoly && <span>(</span>}
       {renderSymbol(symbol)}
       {count > 1 && isPoly && <span>)</span>}
-      {count > 1 && <sub className="text-[0.6em] align-baseline relative top-[0.3em]">{count}</sub>}
+      {count > 1 && <sub className="text-[0.7em] align-sub">{count}</sub>}
       {showCharge && charge !== undefined && (
-        <sup className="text-[0.6em] ml-0.5 font-bold align-baseline relative -top-[0.4em]">{formatCharge(charge)}</sup>
+        <sup className="text-[0.7em] ml-0.5 font-bold align-super">{formatCharge(charge)}</sup>
       )}
     </span>
   );

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Ion, IonType, Challenge, GameState, DifficultyLevel, LEVEL_ORDER } from './types';
+import { Ion, IonType, Challenge, GameState, DifficultyLevel, LEVEL_ORDER, HistoryEntry } from './types';
 import { CATIONS, ANIONS, LEVEL_CONFIG, WINS_TO_ADVANCE } from './constants';
 import * as GeminiService from './services/gemini';
 import * as StorageService from './services/storage';
@@ -12,12 +12,32 @@ import OxyanionGuide from './components/OxyanionGuide';
 import Notebook from './components/Notebook';
 import Certificate from './components/Certificate';
 import SettingsModal from './components/SettingsModal';
+import HelpGuide from './components/HelpGuide';
 import Footer from './components/Footer';
-import { FlaskConical, Trophy, BrainCircuit, LayoutGrid, Layers, BookOpen, Lock, CheckCircle, Settings, NotebookPen } from 'lucide-react';
+import { FlaskConical, Trophy, BrainCircuit, LayoutGrid, Layers, BookOpen, Lock, CheckCircle, Settings, NotebookPen, HelpCircle } from 'lucide-react';
+
+// Helper for subscripts
+const toSubscript = (n: number) => n.toString().split('').map(c => '₀₁₂₃₄₅₆₇₈₉'[parseInt(c)]).join('');
+const formatFormula = (cation: Ion, anion: Ion, cCount: number, aCount: number) => {
+    let formula = cation.symbol;
+    // Special handling for polyatomics with count > 1 (would need parentheses in a real parser, 
+    // but for the target display we can usually just concatenate or use simplified logic)
+    // For this game, we'll keep it simple or add parens if needed manually.
+    // Actually, let's just append subscripts.
+    const cationPart = cation.isPolyatomic && cCount > 1 ? `(${cation.symbol})` : cation.symbol;
+    const cationSub = cCount > 1 ? toSubscript(cCount) : '';
+    
+    const anionPart = anion.isPolyatomic && aCount > 1 ? `(${anion.symbol})` : anion.symbol;
+    const anionSub = aCount > 1 ? toSubscript(aCount) : '';
+    
+    // Rudimentary handling of formatting numbers in symbol (e.g. NH4 -> NH₄)
+    const formatSymbol = (s: string) => s.replace(/\d+/g, (match) => toSubscript(parseInt(match)));
+
+    return `${formatSymbol(cationPart)}${cationSub}${formatSymbol(anionPart)}${anionSub}`;
+};
 
 const App: React.FC = () => {
   // --- State ---
-  // Lazy initialization to check for saved game
   const [gameState, setGameState] = useState<GameState>(() => {
     const saved = StorageService.loadProgress();
     const baseState: GameState = {
@@ -34,15 +54,19 @@ const App: React.FC = () => {
         showTutor: false,
         unlockedLevels: [DifficultyLevel.NOVICE],
         levelWins: 0,
-        notes: ''
+        notes: '',
+        history: [],
+        certificates: []
     };
 
     if (saved) {
         return {
             ...baseState,
             ...saved,
-            // Ensure level is valid
             level: LEVEL_ORDER.includes(saved.level) ? saved.level : DifficultyLevel.NOVICE,
+            // Ensure arrays exist if loading from old save version
+            history: saved.history || [],
+            certificates: saved.certificates || []
         };
     }
     return baseState;
@@ -52,38 +76,116 @@ const App: React.FC = () => {
   const [isAILoading, setIsAILoading] = useState(false);
   const [showCertificate, setShowCertificate] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  // Default showHelp to true so it opens every time the app loads
+  const [showHelp, setShowHelp] = useState(true);
   const [completedLevel, setCompletedLevel] = useState<DifficultyLevel | null>(null);
+  const [hasSeenTutorial, setHasSeenTutorial] = useState(false);
 
   // --- Auto-Save Effect ---
   useEffect(() => {
-      StorageService.saveProgress(gameState);
-  }, [gameState.score, gameState.level, gameState.unlockedLevels, gameState.levelWins, gameState.streak, gameState.notes]);
+      StorageService.saveProgress(gameState, hasSeenTutorial);
+  }, [gameState, hasSeenTutorial]);
 
   // --- Game Logic ---
 
   const generateChallenge = useCallback((level: DifficultyLevel): Challenge => {
     const config = LEVEL_CONFIG[level];
-    // Pick random cation and anion from the allowed lists
     const cIdx = Math.floor(Math.random() * config.ions.cations.length);
     const aIdx = Math.floor(Math.random() * config.ions.anions.length);
-    
     const cation = config.ions.cations[cIdx];
     const anion = config.ions.anions[aIdx];
 
+    let targetName = `${cation.name} ${anion.name}`;
+    let cationOptions: string[] = [];
+    let anionOptions: string[] = [];
+
+    // Grandmaster Logic
+    if (level === DifficultyLevel.GRANDMASTER) {
+        // Calculate counts for formula
+        const lcm = (a, b) => {
+            const gcd = (x, y) => (!y ? x : gcd(y, x % y));
+            return (a * b) / gcd(a, b);
+        };
+        const common = lcm(cation.charge, Math.abs(anion.charge));
+        const cCount = common / cation.charge;
+        const aCount = common / Math.abs(anion.charge);
+        
+        targetName = formatFormula(cation, anion, cCount, aCount);
+
+        // Generate Distractors
+        const getRandom = (arr: Ion[], exclude: string) => {
+            const filtered = arr.filter(i => i.name !== exclude);
+            return filtered[Math.floor(Math.random() * filtered.length)].name;
+        };
+
+        // Cation options: Correct + 3 Random (try to pick same element with diff charge if possible)
+        const cationDistractors = new Set<string>();
+        cationDistractors.add(cation.name);
+        // Try to find same element (e.g. Iron II vs Iron III)
+        const sameElement = config.ions.cations.find(c => c.elementSymbol === cation.elementSymbol && c.name !== cation.name);
+        if (sameElement) cationDistractors.add(sameElement.name);
+        
+        while(cationDistractors.size < 4) {
+            cationDistractors.add(getRandom(config.ions.cations, cation.name));
+        }
+        cationOptions = Array.from(cationDistractors).sort(() => Math.random() - 0.5);
+
+        // Anion options
+        const anionDistractors = new Set<string>();
+        anionDistractors.add(anion.name);
+        // Try to find similar name (Sulfate vs Sulfite)
+        const similar = config.ions.anions.find(a => 
+            (a.name.startsWith(anion.name.substring(0, 3)) || anion.name.startsWith(a.name.substring(0, 3))) 
+            && a.name !== anion.name
+        );
+        if (similar) anionDistractors.add(similar.name);
+
+        while(anionDistractors.size < 4) {
+            anionDistractors.add(getRandom(config.ions.anions, anion.name));
+        }
+        anionOptions = Array.from(anionDistractors).sort(() => Math.random() - 0.5);
+    }
+
     return {
-      targetName: `${cation.name} ${anion.name}`,
+      targetName,
       cation,
-      anion
+      anion,
+      cationOptions,
+      anionOptions
     };
   }, []);
 
-  // Initialize game / Ensure challenge exists
+  // Ensure initial challenge exists
   useEffect(() => {
     if (!gameState.currentChallenge) {
       const challenge = generateChallenge(gameState.level);
       setGameState(prev => ({ ...prev, currentChallenge: challenge }));
     }
   }, [gameState.level, gameState.currentChallenge, generateChallenge]);
+
+  // Validation Effect: Fixes stuck states (e.g. Mercury in Novice)
+  useEffect(() => {
+      if (gameState.currentChallenge && gameState.gameStatus === 'playing') {
+          const config = LEVEL_CONFIG[gameState.level];
+          // Check if current challenge's ions are allowed in the current level config
+          const isValidCation = config.ions.cations.some(c => c.symbol === gameState.currentChallenge!.cation.symbol);
+          const isValidAnion = config.ions.anions.some(a => a.symbol === gameState.currentChallenge!.anion.symbol);
+          
+          if (!isValidCation || !isValidAnion) {
+              setGameState(prev => ({
+                  ...prev,
+                  currentChallenge: generateChallenge(prev.level),
+                  // Reset selection to avoid mismatches
+                  selectedCation: null,
+                  selectedAnion: null,
+                  cationCount: 1,
+                  anionCount: 1,
+                  feedbackMessage: '',
+                  showTutor: false
+              }));
+          }
+      }
+  }, [gameState.level, gameState.currentChallenge, gameState.gameStatus, generateChallenge]);
 
   const handleIonSelect = (ion: Ion) => {
     if (gameState.gameStatus !== 'playing') return;
@@ -92,12 +194,21 @@ const App: React.FC = () => {
       ...prev,
       selectedCation: ion.type === IonType.CATION ? ion : prev.selectedCation,
       selectedAnion: ion.type === IonType.ANION ? ion : prev.selectedAnion,
-      // Reset counts when changing ions
       cationCount: ion.type === IonType.CATION ? 1 : prev.cationCount,
       anionCount: ion.type === IonType.ANION ? 1 : prev.anionCount,
       feedbackMessage: '',
       showTutor: false
     }));
+  };
+
+  const handleGrandmasterSelect = (type: IonType, name: string) => {
+      // Find the ion object matching the name from the full list
+      // We search all ions since GM has access to all
+      const ionList = type === IonType.CATION ? CATIONS : ANIONS;
+      const ion = ionList.find(i => i.name === name);
+      if (ion) {
+          handleIonSelect(ion);
+      }
   };
 
   const handleCountUpdate = (type: IonType, change: number) => {
@@ -138,9 +249,13 @@ const App: React.FC = () => {
         showTutor: false,
         unlockedLevels: [DifficultyLevel.NOVICE],
         levelWins: 0,
-        notes: ''
+        notes: '',
+        history: [],
+        certificates: []
     });
+    setHasSeenTutorial(false);
     setShowSettings(false);
+    setShowHelp(true);
   };
 
   const handleUpdateNotes = (text: string) => {
@@ -149,7 +264,6 @@ const App: React.FC = () => {
 
   const requestTutorHelp = async () => {
     if (!gameState.currentChallenge) return;
-    
     setIsAILoading(true);
     const help = await GeminiService.getTutorHelp(
         gameState.level, 
@@ -162,37 +276,57 @@ const App: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    const { currentChallenge, selectedCation, selectedAnion, cationCount, anionCount } = gameState;
+    const { currentChallenge, selectedCation, selectedAnion, cationCount, anionCount, level } = gameState;
     if (!currentChallenge || !selectedCation || !selectedAnion) return;
 
-    const isCorrectIons = selectedCation.symbol === currentChallenge.cation.symbol && 
-                          selectedAnion.symbol === currentChallenge.anion.symbol;
-    
-    // For Transition metals like Iron(II) vs Iron(III), the symbol is Fe for both, so we check charge too
-    const isCorrectCharges = selectedCation.charge === currentChallenge.cation.charge &&
-                             selectedAnion.charge === currentChallenge.anion.charge;
+    let isSuccess = false;
 
-    const netCharge = (selectedCation.charge * cationCount) + (selectedAnion.charge * anionCount);
-    const isBalanced = netCharge === 0;
-
-    const isSuccess = isCorrectIons && isCorrectCharges && isBalanced;
+    if (level === DifficultyLevel.GRANDMASTER) {
+        // In GM, we only check if the NAMES match. Balancing is not the user's task here.
+        const isCorrectCation = selectedCation.name === currentChallenge.cation.name;
+        const isCorrectAnion = selectedAnion.name === currentChallenge.anion.name;
+        isSuccess = isCorrectCation && isCorrectAnion;
+    } else {
+        // Standard modes
+        const isCorrectIons = selectedCation.symbol === currentChallenge.cation.symbol && 
+                              selectedAnion.symbol === currentChallenge.anion.symbol;
+        const isCorrectCharges = selectedCation.charge === currentChallenge.cation.charge &&
+                                 selectedAnion.charge === currentChallenge.anion.charge;
+        const netCharge = (selectedCation.charge * cationCount) + (selectedAnion.charge * anionCount);
+        const isBalanced = netCharge === 0;
+        isSuccess = isCorrectIons && isCorrectCharges && isBalanced;
+    }
 
     setIsAILoading(true);
+    // For GM, the "Target Name" passed to AI should be the proper name (e.g. Sodium Chloride), not the formula
+    // We reconstruct the proper name from the challenge ions for the feedback prompt
+    const properName = `${currentChallenge.cation.name} ${currentChallenge.anion.name}`;
     
     const feedback = await GeminiService.getAIFeedback(
         selectedCation,
         selectedAnion,
         cationCount,
         anionCount,
-        currentChallenge.targetName,
+        properName,
         isSuccess
     );
-
     setIsAILoading(false);
 
     if (isSuccess) {
       const newWins = gameState.levelWins + 1;
       
+      // Create Log Entry
+      const newHistoryEntry: HistoryEntry = {
+        id: Date.now().toString(),
+        timestamp: Date.now(),
+        targetName: properName, // Save the name, not the formula for the log
+        cation: selectedCation,
+        anion: selectedAnion,
+        cationCount: cationCount,
+        anionCount: anionCount,
+        funFact: feedback
+      };
+
       setGameState(prev => ({
         ...prev,
         score: prev.score + 10 + (prev.streak * 2),
@@ -200,7 +334,9 @@ const App: React.FC = () => {
         levelWins: newWins,
         gameStatus: 'success',
         feedbackMessage: feedback,
-        showTutor: true
+        showTutor: true,
+        // Add to history (prepend to show newest first)
+        history: [newHistoryEntry, ...prev.history]
       }));
 
     } else {
@@ -220,19 +356,34 @@ const App: React.FC = () => {
          setCompletedLevel(gameState.level);
          setShowCertificate(true);
          
+         // Add Certificate if not already owned for this level
+         const hasCertificate = gameState.certificates.some(c => c.level === gameState.level);
+         let newCertificates = gameState.certificates;
+         
+         if (!hasCertificate) {
+             newCertificates = [...gameState.certificates, {
+                 level: gameState.level,
+                 timestamp: Date.now()
+             }];
+         }
+
          // Unlock logic
          const currentIdx = LEVEL_ORDER.indexOf(gameState.level);
+         let newUnlocked = gameState.unlockedLevels;
          if (currentIdx < LEVEL_ORDER.length - 1) {
              const nextLevel = LEVEL_ORDER[currentIdx + 1];
-             setGameState(prev => ({
-                 ...prev,
-                 unlockedLevels: prev.unlockedLevels.includes(nextLevel) 
-                   ? prev.unlockedLevels 
-                   : [...prev.unlockedLevels, nextLevel]
-             }));
+             newUnlocked = gameState.unlockedLevels.includes(nextLevel) 
+                   ? gameState.unlockedLevels 
+                   : [...gameState.unlockedLevels, nextLevel];
          }
+
+         setGameState(prev => ({
+             ...prev,
+             certificates: newCertificates,
+             unlockedLevels: newUnlocked
+         }));
+
     } else {
-        // Reset for next question
         setGameState(prev => ({
             ...prev,
             gameStatus: 'playing',
@@ -249,7 +400,6 @@ const App: React.FC = () => {
 
   const changeLevel = (level: DifficultyLevel) => {
       if (!gameState.unlockedLevels.includes(level)) return;
-
       setGameState(prev => ({
           ...prev,
           level: level,
@@ -289,13 +439,22 @@ const App: React.FC = () => {
       }));
   };
 
+  const handleViewCertificate = (level: DifficultyLevel) => {
+      setCompletedLevel(level);
+      setShowCertificate(true);
+  };
+
+  const handleCloseHelp = () => {
+      setShowHelp(false);
+      setHasSeenTutorial(true);
+  };
+
   const currentConfig = LEVEL_CONFIG[gameState.level];
   const currentLevelIdx = LEVEL_ORDER.indexOf(gameState.level);
 
   return (
     <div className="min-h-screen h-dvh bg-indigo-50 flex flex-col overflow-hidden font-sans">
       
-      {/* Settings Modal */}
       {showSettings && (
           <SettingsModal 
             onClose={() => setShowSettings(false)}
@@ -305,7 +464,6 @@ const App: React.FC = () => {
           />
       )}
 
-      {/* Certificate Modal */}
       {showCertificate && completedLevel && (
           <Certificate 
             level={completedLevel} 
@@ -315,7 +473,10 @@ const App: React.FC = () => {
           />
       )}
 
-      {/* --- Header --- */}
+      {showHelp && (
+          <HelpGuide onClose={handleCloseHelp} />
+      )}
+
       <header className="bg-white border-b border-indigo-100 px-3 py-2 md:px-6 md:py-4 flex items-center justify-between shadow-sm z-30 shrink-0 relative h-12 md:h-16">
             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 via-teal-500 to-emerald-500"></div>
             
@@ -329,8 +490,7 @@ const App: React.FC = () => {
                     </h1>
                 </div>
                 
-                {/* Desktop/Tablet Level Selector */}
-                <div className="hidden lg:flex bg-slate-100 rounded-xl p-1 gap-1 border border-slate-200">
+                <div className="hidden lg:flex bg-slate-100 rounded-xl p-1 gap-1 border border-slate-200 overflow-x-auto max-w-[400px]">
                     {LEVEL_ORDER.map((lvl) => {
                         const isUnlocked = gameState.unlockedLevels.includes(lvl);
                         const isCurrent = gameState.level === lvl;
@@ -340,12 +500,12 @@ const App: React.FC = () => {
                                 onClick={() => changeLevel(lvl)}
                                 disabled={!isUnlocked}
                                 className={`
-                                    px-4 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all flex items-center gap-2
+                                    px-3 py-1.5 text-[10px] md:text-xs font-bold uppercase tracking-wider rounded-lg transition-all flex items-center gap-2 whitespace-nowrap
                                     ${isCurrent ? 'bg-white text-emerald-600 shadow-sm ring-1 ring-slate-200' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-200/50'}
                                     ${!isUnlocked ? 'opacity-40 cursor-not-allowed' : ''}
                                 `}
                             >
-                                {lvl}
+                                {lvl === DifficultyLevel.GRANDMASTER ? 'G.Master' : lvl}
                                 {!isUnlocked && <Lock className="w-3 h-3" />}
                                 {isUnlocked && !isCurrent && gameState.unlockedLevels.indexOf(lvl) < currentLevelIdx && <CheckCircle className="w-3 h-3 text-emerald-500" />}
                             </button>
@@ -355,7 +515,6 @@ const App: React.FC = () => {
             </div>
             
             <div className="flex items-center gap-2 md:gap-6">
-                {/* Level Progress Bar */}
                 <div className="flex flex-col items-end justify-center">
                     <div className="text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wider hidden sm:block">
                         Level Progress
@@ -373,7 +532,14 @@ const App: React.FC = () => {
                     <span>{gameState.score}</span>
                 </div>
 
-                {/* Settings Button */}
+                <button 
+                    onClick={() => setShowHelp(true)}
+                    className="p-2 md:p-3 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors"
+                    title="How to Play"
+                >
+                    <HelpCircle className="w-4 h-4 md:w-6 md:h-6" />
+                </button>
+
                 <button 
                     onClick={() => setShowSettings(true)}
                     className="p-2 md:p-3 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
@@ -383,13 +549,8 @@ const App: React.FC = () => {
             </div>
       </header>
 
-      {/* --- Main Content Grid --- */}
-      <main className="flex-1 overflow-hidden flex flex-col xl:flex-row relative">
-        
-        {/* LEFT/TOP: Gameplay Area */}
+      <main className="flex-1 overflow-hidden flex flex-col lg:flex-row relative">
         <div className="flex-1 flex flex-col p-2 md:p-6 overflow-y-auto gap-2 md:gap-6 relative z-10 bg-indigo-50/50">
-            
-            {/* Target Display */}
             <div className="bg-white rounded-xl md:rounded-3xl p-3 md:p-6 shadow-md shadow-indigo-100 border border-indigo-100 text-center relative overflow-hidden shrink-0 max-w-[1920px] mx-auto w-full">
                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-teal-500 to-emerald-500"></div>
                  <div className="flex justify-between items-start">
@@ -399,7 +560,7 @@ const App: React.FC = () => {
                             {gameState.currentChallenge?.targetName}
                          </h1>
                      </div>
-                     {gameState.gameStatus === 'playing' && (
+                     {gameState.gameStatus === 'playing' && gameState.level !== DifficultyLevel.GRANDMASTER && (
                          <button 
                             onClick={requestTutorHelp}
                             className="p-1.5 -mr-1 md:mr-0 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors"
@@ -411,21 +572,23 @@ const App: React.FC = () => {
                  </div>
             </div>
 
-            {/* Workstation */}
-            <div className="flex-1 min-h-[250px] md:min-h-[350px] w-full max-w-[1920px] mx-auto">
+            <div className="flex-1 min-h-[250px] w-full max-w-[1920px] mx-auto">
                 <Workstation 
+                    level={gameState.level}
                     cation={gameState.selectedCation}
                     anion={gameState.selectedAnion}
                     cationCount={gameState.cationCount}
                     anionCount={gameState.anionCount}
+                    cationOptions={gameState.currentChallenge?.cationOptions}
+                    anionOptions={gameState.currentChallenge?.anionOptions}
                     onUpdateCount={handleCountUpdate}
+                    onSelectName={handleGrandmasterSelect}
                     onSubmit={handleSubmit}
                     onNext={handleNextChallenge}
                     onClear={handleClear}
                     isSubmitting={isAILoading}
                     gameStatus={gameState.gameStatus}
                 >
-                    {/* Inject AI Tutor here */}
                     {gameState.showTutor && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 mt-2">
                             <AITutor 
@@ -439,10 +602,7 @@ const App: React.FC = () => {
             </div>
         </div>
 
-        {/* RIGHT/BOTTOM: Ion Selection Tabs */}
-        <div className="h-[40dvh] md:h-[55dvh] xl:h-auto xl:w-[45%] bg-white border-t xl:border-t-0 xl:border-l border-indigo-100 flex flex-col shadow-[0_-4px_20px_rgba(0,0,0,0.05)] xl:shadow-none z-20 relative">
-            
-            {/* Scrollable Tabs Container */}
+        <div className="h-[35dvh] lg:h-auto lg:w-[40%] xl:w-[45%] bg-white border-t lg:border-t-0 lg:border-l border-indigo-100 flex flex-col shadow-[0_-4px_20px_rgba(0,0,0,0.05)] lg:shadow-none z-20 relative">
             <div className="flex p-2 gap-2 bg-indigo-50/50 overflow-x-auto no-scrollbar shrink-0">
                 <button 
                     onClick={() => setActiveTab('periodic')}
@@ -470,7 +630,6 @@ const App: React.FC = () => {
                 </button>
             </div>
 
-            {/* Content Area */}
             <div className="flex-1 overflow-y-auto bg-slate-50 pb-safe">
                 {activeTab === 'periodic' && (
                     <div className="p-2 md:p-4 pb-20">
@@ -496,15 +655,16 @@ const App: React.FC = () => {
                 {activeTab === 'notebook' && (
                     <Notebook 
                         notes={gameState.notes} 
-                        onUpdateNotes={handleUpdateNotes} 
+                        onUpdateNotes={handleUpdateNotes}
+                        history={gameState.history}
+                        certificates={gameState.certificates}
+                        onViewCertificate={handleViewCertificate}
                     />
                 )}
             </div>
         </div>
 
       </main>
-
-      {/* Footer */}
       <Footer />
     </div>
   );
