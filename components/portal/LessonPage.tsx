@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Lesson } from '../../portal/types';
-import { LessonProgress } from '../../types';
-import { Lightbulb, HelpCircle, Book, FlaskConical, Check, X, AlertCircle, ClipboardList, CheckCircle2, ArrowRight, ArrowLeft, PenTool, RotateCcw, Award } from 'lucide-react';
+import { LessonProgressData } from '../../types';
+import { Lightbulb, HelpCircle, Book, FlaskConical, Check, X, AlertCircle, ClipboardList, CheckCircle2, ArrowRight, ArrowLeft, PenTool } from 'lucide-react';
 import ParticleStateSim from './simulations/ParticleStateSim';
 import HeatingCurveSim from './simulations/HeatingCurveSim';
 import DiffusionSim from './simulations/DiffusionSim';
@@ -18,136 +18,83 @@ import FiltrationSim from './simulations/FiltrationSim';
 import ChromatographySim from './simulations/ChromatographySim';
 import IonFormationSim from './simulations/IonFormationSim';
 import OxyanionBuilderSim from './simulations/OxyanionBuilderSim';
-import DotCrossSim from './simulations/DotCrossSim';
+import IonicBondingSim from './simulations/IonicBondingSim';
 
 interface LessonPageProps {
   lesson: Lesson;
+  initialData?: LessonProgressData;
+  onSave: (data: LessonProgressData) => void;
   onLaunchSimulation: () => void;
   onComplete: (lessonId: string) => void;
   onNext?: () => void;
   onPrev?: () => void;
-  initialProgress?: LessonProgress;
-  onUpdateProgress: (lessonId: string, progress: LessonProgress) => void;
 }
 
 // Helper: Smart Normalization
 // Removes ALL spaces and converts to lowercase
+// e.g. "Cobalt (II) Carbonate " -> "cobalt(ii)carbonate"
 const normalizeAnswer = (str: string) => {
     return str.replace(/\s+/g, '').toLowerCase().trim();
 };
 
-const LessonPage: React.FC<LessonPageProps> = ({ 
-    lesson, onLaunchSimulation, onComplete, onNext, onPrev, 
-    initialProgress, onUpdateProgress 
-}) => {
-  const [selections, setSelections] = useState<Record<number, number>>({});
-  const [textAnswers, setTextAnswers] = useState<Record<number, string>>({});
+const LessonPage: React.FC<LessonPageProps> = ({ lesson, initialData, onSave, onLaunchSimulation, onComplete, onNext, onPrev }) => {
+  const [selections, setSelections] = useState<Record<number, number>>(initialData?.selections || {});
+  const [textAnswers, setTextAnswers] = useState<Record<number, string>>(initialData?.textAnswers || {});
   const [isCompleted, setIsCompleted] = useState(false);
-  const [validatedInputs, setValidatedInputs] = useState<Record<number, boolean>>({}); // true = correct, false = incorrect, undefined = not checked
-  const [attempts, setAttempts] = useState<Record<number, number>>({}); // Track attempt count
-  const [currentScore, setCurrentScore] = useState(0);
+  const [showError, setShowError] = useState(false);
+  
+  // Tracks validation status per question: undefined (not checked), true (correct), false (incorrect)
+  const [validatedInputs, setValidatedInputs] = useState<Record<number, boolean>>(initialData?.validatedInputs || {});
 
-  // Flag to prevent saving when just loading initial state
-  const isHydrating = useRef(true);
-
-  // Hydrate state when lesson changes
+  // Update state ONLY when lesson changes (navigation)
+  // We do NOT include initialData in dependency array to avoid re-syncing loop when parent updates
   useEffect(() => {
-      isHydrating.current = true;
-      if (initialProgress) {
-          setSelections(initialProgress.selections || {});
-          setTextAnswers(initialProgress.textAnswers || {});
-          setValidatedInputs(initialProgress.validatedInputs || {});
-          setAttempts(initialProgress.attempts || {});
-          setIsCompleted(initialProgress.isCompleted || false);
-          setCurrentScore(initialProgress.score || 0);
-      } else {
-          setSelections({});
-          setTextAnswers({});
-          setValidatedInputs({});
-          setAttempts({});
-          setIsCompleted(false);
-          setCurrentScore(0);
-      }
-      
-      // Allow saving after initial render cycle
-      setTimeout(() => { isHydrating.current = false; }, 50);
+      setSelections(initialData?.selections || {});
+      setTextAnswers(initialData?.textAnswers || {});
+      setValidatedInputs(initialData?.validatedInputs || {});
+      setIsCompleted(false);
+      setShowError(false);
   }, [lesson.id]);
 
-  // Auto-Save Effect
+  // Auto-save whenever progress state changes
   useEffect(() => {
-      if (isHydrating.current) return;
-
-      const progress: LessonProgress = {
+      onSave({
           selections,
           textAnswers,
-          validatedInputs,
-          attempts,
-          score: currentScore,
-          isCompleted
-      };
-      
-      onUpdateProgress(lesson.id, progress);
-  }, [selections, textAnswers, validatedInputs, attempts, currentScore, isCompleted, lesson.id]);
+          validatedInputs
+      });
+  }, [selections, textAnswers, validatedInputs, onSave]);
 
   const handleSelect = (blockIdx: number, optionIdx: number) => {
-    // Only allow changing selection if not currently marked as correct
-    if (validatedInputs[blockIdx] === true) return;
-    
     setSelections(prev => ({ ...prev, [blockIdx]: optionIdx }));
-    // Reset validation status for this block so user can "Check" again
-    if (validatedInputs[blockIdx] === false) {
-        const newVal = { ...validatedInputs };
-        delete newVal[blockIdx];
-        setValidatedInputs(newVal);
+    
+    // Immediate Validation Logic for Multiple Choice
+    const block = lesson.blocks[blockIdx];
+    if (block.checkpoint && block.checkpoint.correctIndex !== undefined) {
+        const isCorrect = optionIdx === block.checkpoint.correctIndex;
+        setValidatedInputs(prev => ({ ...prev, [blockIdx]: isCorrect }));
     }
+
+    setShowError(false);
   };
 
   const handleTextChange = (blockIdx: number, val: string) => {
-      // Only allow changing text if not currently marked as correct
-      if (validatedInputs[blockIdx] === true) return;
-
       setTextAnswers(prev => ({ ...prev, [blockIdx]: val }));
-      
-      // Reset validation status so "Check" button reappears
+      // If user types after an error, reset validation state to allow retry immediately
       if (validatedInputs[blockIdx] === false) {
-          const newVal = { ...validatedInputs };
-          delete newVal[blockIdx];
-          setValidatedInputs(newVal);
+          setValidatedInputs(prev => {
+              const next = { ...prev };
+              delete next[blockIdx];
+              return next;
+          });
       }
+      setShowError(false);
   };
 
-  const calculateTotalScore = () => {
-      const checkpoints = lesson.blocks.filter(b => b.type === 'checkpoint');
-      if (checkpoints.length === 0) return 100;
-
-      let totalPoints = 0;
-      const maxPoints = checkpoints.length * 100;
-
-      lesson.blocks.forEach((block, idx) => {
-          if (block.type === 'checkpoint') {
-              const attemptCount = attempts[idx] || 0;
-              const isCorrect = validatedInputs[idx] === true;
-              
-              if (isCorrect) {
-                  // 100 for 1st try, 50 for 2nd, 25 for 3rd, 10 minimum
-                  if (attemptCount <= 1) totalPoints += 100;
-                  else if (attemptCount === 2) totalPoints += 50;
-                  else if (attemptCount === 3) totalPoints += 25;
-                  else totalPoints += 10;
-              }
-          }
-      });
-
-      return Math.round((totalPoints / maxPoints) * 100);
-  };
-
-  // CHECK ONE BY ONE
+  // CHECK ONE BY ONE (For Text Inputs)
   const handleCheckSingle = (blockIdx: number) => {
       const block = lesson.blocks[blockIdx];
       if (!block.checkpoint) return;
-
-      // Increment Attempt
-      setAttempts(prev => ({ ...prev, [blockIdx]: (prev[blockIdx] || 0) + 1 }));
 
       let isCorrect = false;
       if (block.checkpoint.variant === 'text-input') {
@@ -155,17 +102,11 @@ const LessonPage: React.FC<LessonPageProps> = ({
           const accepted = block.checkpoint.acceptedAnswers?.map(normalizeAnswer) || [];
           isCorrect = accepted.includes(userAns);
       } else {
+          // Fallback for MC if not using immediate validation
           isCorrect = selections[blockIdx] === block.checkpoint.correctIndex;
       }
 
       setValidatedInputs(prev => ({ ...prev, [blockIdx]: isCorrect }));
-  };
-
-  const handleRetry = (blockIdx: number) => {
-      // Reset validation state to allow editing
-      const newVal = { ...validatedInputs };
-      delete newVal[blockIdx];
-      setValidatedInputs(newVal);
   };
 
   // CHECK ALL (Final Completion)
@@ -174,36 +115,53 @@ const LessonPage: React.FC<LessonPageProps> = ({
         .map((b, idx) => ({ block: b, idx }))
         .filter(item => item.block.type === 'checkpoint');
       
-      const allDone = checkpoints.every(item => validatedInputs[item.idx] === true);
+      const totalCheckpoints = checkpoints.length;
+      
+      if (totalCheckpoints > 0) {
+          let correctCount = 0;
+          const newValidatedInputs = { ...validatedInputs };
 
-      if (allDone || checkpoints.length === 0) {
-          const finalScore = calculateTotalScore();
-          setCurrentScore(finalScore);
+          checkpoints.forEach(item => {
+              let isCorrect = false;
+              // Check if already validated and correct
+              if (newValidatedInputs[item.idx] === true) {
+                  isCorrect = true;
+              } else {
+                  // Re-validate if needed (e.g. text inputs not checked yet)
+                  if (item.block.checkpoint?.variant === 'text-input') {
+                      const userAns = normalizeAnswer(textAnswers[item.idx] || '');
+                      const accepted = item.block.checkpoint.acceptedAnswers?.map(normalizeAnswer) || [];
+                      isCorrect = accepted.includes(userAns);
+                  } else {
+                      if (selections[item.idx] === item.block.checkpoint?.correctIndex) {
+                          isCorrect = true;
+                      }
+                  }
+                  newValidatedInputs[item.idx] = isCorrect;
+              }
+              
+              if (isCorrect) correctCount++;
+          });
+
+          setValidatedInputs(newValidatedInputs);
+
+          if (correctCount === totalCheckpoints) {
+              setIsCompleted(true);
+              onComplete(lesson.id);
+              if (onNext) onNext();
+          } else {
+              setShowError(true);
+          }
+      } else {
           setIsCompleted(true);
           onComplete(lesson.id);
-          
-          // Scroll to bottom
-          setTimeout(() => {
-              window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-          }, 100);
-      } else {
-          // If they click finish but haven't checked everything, run checks on unchecked items
-          checkpoints.forEach(item => {
-              if (validatedInputs[item.idx] === undefined) {
-                  handleCheckSingle(item.idx);
-              }
-          });
+          if (onNext) onNext();
       }
   };
 
-  const hasUncheckedQuestions = lesson.blocks
-      .map((b, idx) => ({ type: b.type, idx }))
-      .filter(item => item.type === 'checkpoint')
-      .some(item => validatedInputs[item.idx] !== true);
-
   return (
-    <div className="w-full max-w-none mx-auto pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="mb-8 border-b border-slate-200 pb-6 flex flex-col md:flex-row justify-between items-start gap-4 max-w-7xl mx-auto">
+    <div className="w-full max-w-none mx-auto pb-20">
+      <div className="mb-8 border-b border-slate-200 pb-6 flex justify-between items-start gap-4 max-w-7xl mx-auto">
           <div>
             <h1 className="text-3xl md:text-5xl font-black text-slate-900 mb-2 leading-tight">
                 {lesson.title}
@@ -211,8 +169,8 @@ const LessonPage: React.FC<LessonPageProps> = ({
             <p className="text-slate-500 font-medium">Edexcel IGCSE (9-1) Specification Content</p>
           </div>
           {isCompleted && (
-              <div className="bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full font-bold text-xs uppercase tracking-wide flex items-center gap-2 animate-in zoom-in shrink-0 shadow-sm border border-emerald-200">
-                  <CheckCircle2 className="w-5 h-5" /> Completed • Score: {currentScore}%
+              <div className="bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full font-bold text-xs uppercase tracking-wide flex items-center gap-2 animate-in zoom-in shrink-0">
+                  <CheckCircle2 className="w-5 h-5" /> Completed
               </div>
           )}
       </div>
@@ -352,24 +310,20 @@ const LessonPage: React.FC<LessonPageProps> = ({
               const validationState = validatedInputs[idx];
               const hasAnswered = validationState !== undefined;
               const isCorrect = validationState === true;
-              const attemptCount = attempts[idx] || 0;
+              const isIncorrect = validationState === false;
+
+              // Only permanently lock if correct
+              const isQuestionSolved = isCorrect; 
 
               return (
                 <div key={idx} className="my-10 bg-white border-2 border-slate-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow max-w-5xl mx-auto">
-                   <div className="bg-gradient-to-r from-slate-50 to-white px-6 py-4 border-b border-slate-200 flex gap-3 items-center justify-between">
-                       <div className="flex gap-3 items-center">
-                           <div className="bg-indigo-100 p-1.5 rounded-lg text-indigo-600">
-                               {isTextInput ? <PenTool className="w-5 h-5" /> : <HelpCircle className="w-5 h-5" />}
-                           </div>
-                           <h4 className="font-black text-slate-700 uppercase tracking-wide text-sm">
-                               {isTextInput ? 'Fill in the Blank' : 'Knowledge Checkpoint'}
-                           </h4>
+                   <div className="bg-gradient-to-r from-slate-50 to-white px-6 py-4 border-b border-slate-200 flex gap-3 items-center">
+                       <div className="bg-indigo-100 p-1.5 rounded-lg text-indigo-600">
+                           {isTextInput ? <PenTool className="w-5 h-5" /> : <HelpCircle className="w-5 h-5" />}
                        </div>
-                       {attemptCount > 0 && (
-                           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                               Attempt: {attemptCount}
-                           </span>
-                       )}
+                       <h4 className="font-black text-slate-700 uppercase tracking-wide text-sm">
+                           {isTextInput ? 'Fill in the Blank' : 'Knowledge Checkpoint'}
+                       </h4>
                    </div>
                    <div className="p-6 md:p-8">
                        <p className="text-xl font-bold text-slate-800 mb-6 leading-snug">
@@ -387,7 +341,7 @@ const LessonPage: React.FC<LessonPageProps> = ({
                                         if (e.key === 'Enter') handleCheckSingle(idx);
                                     }}
                                     placeholder="Type answer here..."
-                                    disabled={isCorrect} 
+                                    disabled={isCorrect} // Lock ONLY if correct
                                     className={`flex-1 p-4 rounded-xl border-2 font-medium outline-none transition-all ${
                                         hasAnswered 
                                             ? (isCorrect 
@@ -396,114 +350,88 @@ const LessonPage: React.FC<LessonPageProps> = ({
                                             : 'border-slate-200 focus:border-indigo-500 focus:bg-slate-50'
                                     }`}
                                />
-                               {/* Check Button */}
+                               {/* Check Button: Visible if not correct yet */}
                                {(!hasAnswered || !isCorrect) && (
                                    <button 
                                         onClick={() => handleCheckSingle(idx)}
                                         disabled={!textAnswers[idx]}
                                         className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow-md transition-all active:scale-95 shrink-0"
                                    >
-                                       {hasAnswered ? 'Re-Check' : 'Check'}
+                                       Check
                                    </button>
                                )}
                            </div>
                        ) : (
-                           // Multiple Choice
-                           <div className="space-y-4">
-                               <div className="grid gap-3 sm:grid-cols-2">
-                                   {block.checkpoint?.options?.map((option, i) => {
-                                       const selected = selections[idx];
-                                       const isSelected = selected === i;
-                                       
-                                       let btnClass = "border-slate-200 bg-white hover:border-indigo-300 hover:shadow-sm text-slate-700";
-                                       
-                                       if (hasAnswered) {
-                                           if (i === block.checkpoint?.correctIndex) {
-                                               // Highlight the correct one ONLY if user got it right or we want to show it
-                                               // But usually we just highlight user selection style
-                                               if (isCorrect) {
-                                                    btnClass = "bg-emerald-50 border-emerald-500 text-emerald-800 ring-1 ring-emerald-500 shadow-md";
-                                               } else {
-                                                    // If wrong, show selected as wrong
-                                                    if (isSelected) btnClass = "bg-rose-50 border-rose-300 text-rose-800 opacity-70";
-                                                    else btnClass = "border-slate-100 text-slate-400 opacity-50 bg-slate-50";
-                                               }
-                                           } else {
-                                               if (isSelected) {
-                                                   btnClass = "bg-rose-50 border-rose-300 text-rose-800 opacity-70";
-                                               } else {
-                                                   btnClass = "border-slate-100 text-slate-400 opacity-50 bg-slate-50";
-                                               }
-                                           }
-                                       } else if (isSelected) {
-                                           btnClass = "border-indigo-500 bg-indigo-50 text-indigo-900 ring-2 ring-indigo-200";
+                           <div className="grid gap-3 sm:grid-cols-2">
+                               {block.checkpoint?.options?.map((option, i) => {
+                                   const selected = selections[idx];
+                                   const isSelected = selected === i;
+                                   const isThisCorrectOption = i === block.checkpoint?.correctIndex;
+                                   
+                                   let btnClass = "border-slate-200 bg-white hover:border-indigo-300 hover:shadow-sm text-slate-700";
+                                   
+                                   if (hasAnswered) {
+                                       // If question is solved (correct answer found), show green for correct
+                                       if (isQuestionSolved && isThisCorrectOption) {
+                                           btnClass = "bg-emerald-50 border-emerald-500 text-emerald-800 ring-1 ring-emerald-500 shadow-md opacity-100";
+                                       } 
+                                       // If this specific option was selected and it is wrong
+                                       else if (isSelected && !isThisCorrectOption) {
+                                           btnClass = "bg-rose-50 border-rose-300 text-rose-800 opacity-100 shadow-inner";
                                        }
+                                       // If question is solved, fade out other options
+                                       else if (isQuestionSolved) {
+                                           btnClass = "border-slate-100 text-slate-300 opacity-40 bg-slate-50";
+                                       }
+                                   } 
+                                   
+                                   // Keep selected state highlight if not yet answered/validated
+                                   if (isSelected && !hasAnswered) {
+                                       btnClass = "border-indigo-500 bg-indigo-50 text-indigo-900 ring-2 ring-indigo-200";
+                                   }
 
-                                       return (
-                                           <button
-                                                key={i}
-                                                onClick={() => !isCorrect && handleSelect(idx, i)}
-                                                disabled={isCorrect}
-                                                className={`text-left px-5 py-4 rounded-xl border-2 font-bold transition-all flex items-center justify-between ${btnClass}`}
-                                           >
-                                               <span dangerouslySetInnerHTML={{ __html: option }} />
-                                               {hasAnswered && isCorrect && i === block.checkpoint?.correctIndex && <Check className="w-5 h-5 text-emerald-600" />}
-                                               {hasAnswered && !isCorrect && isSelected && <X className="w-5 h-5 text-rose-600" />}
-                                           </button>
-                                       )
-                                   })}
-                               </div>
-                               
-                               {/* Check Button for MC (Allows checking after selection) */}
-                               {(!hasAnswered) && selections[idx] !== undefined && (
-                                   <div className="flex justify-end animate-in fade-in slide-in-from-left-2">
+                                   return (
                                        <button
-                                            onClick={() => handleCheckSingle(idx)}
-                                            className="px-8 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition-all active:scale-95"
+                                            key={i}
+                                            onClick={() => !isQuestionSolved && handleSelect(idx, i)}
+                                            disabled={isQuestionSolved} // Only disable if correctly solved
+                                            className={`text-left px-5 py-4 rounded-xl border-2 font-bold transition-all flex items-center justify-between ${btnClass}`}
                                        >
-                                           Check Answer
+                                           <span dangerouslySetInnerHTML={{ __html: option }} />
+                                           
+                                           {/* Icons */}
+                                           {isQuestionSolved && isThisCorrectOption && <Check className="w-5 h-5 text-emerald-600" />}
+                                           {hasAnswered && isSelected && !isThisCorrectOption && <X className="w-5 h-5 text-rose-600" />}
                                        </button>
-                                   </div>
-                               )}
+                                   )
+                               })}
                            </div>
                        )}
 
+                       {/* Feedback Area */}
                        {hasAnswered && (
-                           <div className={`mt-6 p-5 rounded-xl border-l-4 ${isCorrect ? 'bg-emerald-50 border-emerald-500 text-emerald-900' : 'bg-rose-50 border-rose-500 text-rose-900'} animate-in fade-in slide-in-from-top-2 shadow-sm`}>
-                               <div className="flex items-start gap-3">
-                                   <div className={`p-1.5 rounded-full shrink-0 ${isCorrect ? 'bg-emerald-200' : 'bg-rose-200'}`}>
-                                       {isCorrect ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+                           <div className={`mt-6 p-5 rounded-xl border-l-4 shadow-sm ${
+                               isCorrect 
+                               ? 'bg-emerald-50 border-emerald-500 text-emerald-900' 
+                               : 'bg-rose-50 border-rose-500 text-rose-900'
+                           }`}>
+                               <strong className="block text-xs font-black uppercase tracking-widest mb-2 flex items-center gap-2">
+                                   {isCorrect ? <><CheckCircle2 className="w-4 h-4" /> Correct Answer</> : <><AlertCircle className="w-4 h-4" /> Incorrect - Try Again</>}
+                               </strong>
+                               
+                               {(isCorrect || isTextInput) && (
+                                   <p className="text-base leading-relaxed font-medium mb-3">{block.checkpoint?.explanation}</p>
+                               )}
+                               
+                               {/* ALWAYS SHOW THE ACCEPTED ANSWER FOR TEXT INPUTS, EVEN IF CORRECT */}
+                               {isTextInput && block.checkpoint?.acceptedAnswers && (
+                                   <div className={`text-sm p-3 rounded-lg border ${isCorrect ? 'bg-emerald-100/50 border-emerald-200' : 'bg-white/60 border-rose-100/50'} inline-block`}>
+                                       <span className="font-bold opacity-70 block mb-1 text-[10px] uppercase">
+                                           {isCorrect ? 'Standard Format' : 'Accepted Answer'}
+                                       </span> 
+                                       <span className="font-mono text-base font-bold">{block.checkpoint.acceptedAnswers[0]}</span>
                                    </div>
-                                   <div className="flex-1">
-                                       <strong className="block text-xs font-black uppercase tracking-widest mb-2">
-                                           {isCorrect ? 'Correct!' : 'Incorrect'}
-                                       </strong>
-                                       
-                                       <p className="text-base leading-relaxed font-medium mb-3">
-                                           {block.checkpoint?.explanation}
-                                       </p>
-
-                                       {/* Try Again Button */}
-                                       {!isCorrect && (
-                                           <button 
-                                                onClick={() => handleRetry(idx)}
-                                                className="mt-2 text-xs font-black uppercase tracking-wider text-rose-700 flex items-center gap-1 hover:underline"
-                                           >
-                                               <RotateCcw className="w-3 h-3" /> Try Again
-                                           </button>
-                                       )}
-                                       
-                                       {/* ALWAYS SHOW THE ACCEPTED ANSWER FOR TEXT INPUTS if they struggle */}
-                                       {isTextInput && block.checkpoint?.acceptedAnswers && attemptCount > 2 && !isCorrect && (
-                                           <div className="mt-3 text-sm p-3 rounded-lg border bg-white/60 border-rose-200/50 inline-block">
-                                               <span className="font-bold opacity-70 block mb-1 text-[10px] uppercase">
-                                                   Answer Key
-                                               </span> 
-                                               <span className="font-mono text-base font-bold">{block.checkpoint.acceptedAnswers[0]}</span>
-                                           </div>
-                                       )}
-                                   </div>
-                               </div>
+                               )}
                            </div>
                        )}
                    </div>
@@ -532,8 +460,9 @@ const LessonPage: React.FC<LessonPageProps> = ({
               if (block.simulationId === 'chromatography-rf') return <SimWrapper key={idx}><ChromatographySim mode="RF" /></SimWrapper>;
               if (block.simulationId === 'ion-formation') return <SimWrapper key={idx}><IonFormationSim /></SimWrapper>;
               if (block.simulationId === 'oxyanion-builder') return <SimWrapper key={idx}><OxyanionBuilderSim /></SimWrapper>;
-              if (block.simulationId === 'dot-cross-ionic') return <SimWrapper key={idx}><DotCrossSim /></SimWrapper>;
+              if (block.simulationId === 'ionic-bonding') return <SimWrapper key={idx}><IonicBondingSim /></SimWrapper>;
 
+              // Default / IonicMaster simulation launcher
               return (
                 <div key={idx} className="my-12 bg-slate-900 rounded-3xl p-1 md:p-2 shadow-2xl overflow-hidden ring-4 ring-indigo-100 relative group max-w-6xl mx-auto">
                     <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20 pointer-events-none"></div>
@@ -563,52 +492,30 @@ const LessonPage: React.FC<LessonPageProps> = ({
         
         {/* Completion Area */}
         <div className="mt-12 p-8 bg-slate-50 rounded-3xl border border-slate-200 text-center animate-in fade-in slide-in-from-bottom-4 max-w-5xl mx-auto">
-            {isCompleted ? (
-                <div className="mb-8">
-                    <div className="inline-block p-4 rounded-full bg-emerald-100 mb-4 shadow-sm border border-emerald-200">
-                        <Award className="w-12 h-12 text-emerald-600" />
-                    </div>
-                    <h2 className="text-2xl font-black text-slate-800 mb-2">Lesson Complete!</h2>
-                    <div className="inline-flex items-center gap-2 text-lg font-bold text-slate-600 bg-white px-6 py-2 rounded-xl border border-slate-200 shadow-sm">
-                        Score: <span className="text-emerald-600 text-2xl">{currentScore}%</span>
-                    </div>
-                    <p className="text-sm text-slate-400 mt-4 max-w-md mx-auto">
-                        Your progress and score have been saved. You can review your answers or move to the next topic.
-                    </p>
-                </div>
-            ) : hasUncheckedQuestions && (
-                <div className="mb-6 p-4 bg-amber-50 text-amber-800 rounded-xl font-bold flex items-center justify-center gap-2 border border-amber-200">
-                    <AlertCircle className="w-5 h-5" /> You have unanswered questions. Complete them to get your score!
+            {showError && (
+                <div className="mb-6 p-4 bg-rose-100 text-rose-800 rounded-xl font-bold flex items-center justify-center gap-2 animate-bounce">
+                    <AlertCircle className="w-5 h-5" /> Please complete all checkpoints correctly first!
                 </div>
             )}
             
-            <div className="flex flex-col-reverse md:flex-row items-center justify-center gap-4">
-                {onPrev && (
-                    <button 
-                        onClick={onPrev}
-                        className="px-6 py-4 rounded-2xl font-bold text-slate-500 hover:bg-white hover:shadow-sm hover:text-slate-700 transition-all flex items-center justify-center gap-2"
-                    >
-                        <ArrowLeft className="w-5 h-5" /> Previous Lesson
-                    </button>
-                )}
+            <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-4">
+                <button 
+                    onClick={onPrev}
+                    className={`px-6 py-4 rounded-2xl font-bold text-slate-500 hover:bg-white hover:shadow-sm hover:text-slate-700 transition-all flex items-center justify-center gap-2 ${!onPrev ? 'invisible pointer-events-none' : ''}`}
+                >
+                    <ArrowLeft className="w-5 h-5" /> Previous Lesson
+                </button>
 
-                {!isCompleted ? (
-                    <button 
-                        onClick={handleFinish}
-                        className="w-full md:w-auto px-8 py-4 rounded-2xl font-black text-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-200 hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-3"
-                    >
-                        {hasUncheckedQuestions ? 'Check All & Finish' : 'Finish Lesson'} <ArrowRight className="w-5 h-5" />
-                    </button>
-                ) : (
-                    onNext && (
-                        <button 
-                            onClick={onNext}
-                            className="w-full md:w-auto px-8 py-4 rounded-2xl font-black text-lg bg-emerald-600 hover:bg-emerald-500 text-white shadow-xl shadow-emerald-200 hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-3"
-                        >
-                            Next Lesson <ArrowRight className="w-5 h-5" />
-                        </button>
-                    )
-                )}
+                <button 
+                    onClick={handleFinish}
+                    className={`w-full md:w-auto px-8 py-4 rounded-2xl font-black text-lg shadow-xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-3
+                        ${isCompleted 
+                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-200' 
+                            : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-200'}
+                    `}
+                >
+                    {isCompleted ? 'Next Lesson' : 'Check All Answers'} <ArrowRight className="w-5 h-5" />
+                </button>
             </div>
         </div>
       </div>

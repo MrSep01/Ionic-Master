@@ -22,7 +22,7 @@ const ChromatographySim: React.FC<ChromatographySimProps> = ({ mode }) => {
   const [userRf, setUserRf] = useState('');
   const [rfFeedback, setRfFeedback] = useState<'IDLE' | 'CORRECT' | 'WRONG'>('IDLE');
 
-  const reqRef = useRef<number>(0);
+  const reqRef = useRef<number>();
 
   // --- ANIMATION LOOPS ---
 

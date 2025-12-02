@@ -1,5 +1,5 @@
 
-import { GameState, DifficultyLevel, HistoryEntry, CertificateEntry, LessonProgress } from '../types';
+import { GameState, DifficultyLevel, HistoryEntry, CertificateEntry, LessonProgressData } from '../types';
 
 const STORAGE_KEY = 'ionic_master_save_v1';
 
@@ -15,7 +15,7 @@ export interface SavedProgress {
   certificates?: CertificateEntry[];
   hasSeenTutorial?: boolean;
   completedLessons?: string[];
-  lessonProgress?: Record<string, LessonProgress>;
+  lessonProgress?: Record<string, LessonProgressData>;
 }
 
 export const saveProgress = (state: GameState, hasSeenTutorial: boolean = false) => {

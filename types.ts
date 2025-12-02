@@ -62,13 +62,10 @@ export interface CertificateEntry {
   timestamp: number;
 }
 
-export interface LessonProgress {
+export interface LessonProgressData {
   selections: Record<number, number>;
   textAnswers: Record<number, string>;
   validatedInputs: Record<number, boolean>;
-  attempts: Record<number, number>; // Track number of tries per block index
-  score: number; // Final score 0-100
-  isCompleted: boolean;
 }
 
 export interface GameState {
@@ -93,7 +90,7 @@ export interface GameState {
   history: HistoryEntry[]; // Log of synthesized compounds
   certificates: CertificateEntry[]; // Earned certificates
   completedLessons: string[]; // IDs of completed curriculum lessons
-  lessonProgress: Record<string, LessonProgress>; // Detailed progress per lesson ID
+  lessonProgress: Record<string, LessonProgressData>; // Granular progress per lesson
 }
 
 // New types for the UI

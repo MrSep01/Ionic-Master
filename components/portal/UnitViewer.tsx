@@ -1,26 +1,23 @@
 
 import React, { useState } from 'react';
 import { Unit, Topic, Lesson, QuizQuestion } from '../../portal/types';
+import { LessonProgressData } from '../../types';
 import LessonPage from './LessonPage';
 import { BookOpen, CheckCircle, ChevronRight, Menu, X, Play, BrainCircuit, FileText } from 'lucide-react';
-import { LessonProgress } from '../../types';
 
 interface UnitViewerProps {
   unit: Unit;
   onExit: () => void;
   onLaunchSimulation: () => void;
   completedLessons: string[];
+  lessonProgress: Record<string, LessonProgressData>;
   onLessonComplete: (lessonId: string) => void;
-  lessonProgress: Record<string, LessonProgress>;
-  onUpdateLessonProgress: (lessonId: string, progress: LessonProgress) => void;
+  onUpdateLessonProgress: (lessonId: string, data: LessonProgressData) => void;
 }
 
 type ViewMode = { type: 'LESSON', lessonId: string } | { type: 'QUIZ', topicId: string } | { type: 'MOCK' };
 
-const UnitViewer: React.FC<UnitViewerProps> = ({ 
-    unit, onExit, onLaunchSimulation, completedLessons, onLessonComplete, 
-    lessonProgress, onUpdateLessonProgress 
-}) => {
+const UnitViewer: React.FC<UnitViewerProps> = ({ unit, onExit, onLaunchSimulation, completedLessons, lessonProgress, onLessonComplete, onUpdateLessonProgress }) => {
   const [currentView, setCurrentView] = useState<ViewMode>({ 
       type: 'LESSON', 
       lessonId: unit.topics[0].lessons[0].id 
@@ -216,13 +213,13 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
           <div className="w-full h-full p-4 md:p-8 lg:p-12">
                {currentView.type === 'LESSON' && getCurrentLesson() && (
                    <LessonPage 
-                        lesson={getCurrentLesson()!} 
+                        lesson={getCurrentLesson()!}
+                        initialData={lessonProgress[getCurrentLesson()!.id]}
+                        onSave={(data) => onUpdateLessonProgress(getCurrentLesson()!.id, data)}
                         onLaunchSimulation={onLaunchSimulation}
                         onComplete={onLessonComplete}
                         onNext={handleNextLesson}
                         onPrev={currentLessonIndex > 0 ? handlePrevLesson : undefined}
-                        initialProgress={lessonProgress[getCurrentLesson()!.id]}
-                        onUpdateProgress={onUpdateLessonProgress}
                    />
                )}
 

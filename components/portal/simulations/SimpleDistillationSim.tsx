@@ -8,7 +8,7 @@ const SimpleDistillationSim: React.FC = () => {
   const [flaskVolume, setFlaskVolume] = useState(100); // %
   const [beakerVolume, setBeakerVolume] = useState(0); // %
   
-  const reqRef = useRef<number>(0);
+  const reqRef = useRef<number>();
 
   const reset = () => {
     setIsHeating(false);
@@ -159,7 +159,7 @@ const SimpleDistillationSim: React.FC = () => {
                      </clipPath>
                  </defs>
                  <g clipPath="url(#flaskClip)">
-                     <rect x="-40" y={40 - (flaskVolume/100)*80} width="80" height="80" fill="url(#inkLiquid)" style={{ transition: 'y 0.2s' }} />
+                     <rect x="-40" y={40 - (flaskVolume/100)*80} width="80" height="80" fill="url(#inkLiquid)" transition="y 0.2s" />
                      {bubbles.map(b => (
                          <circle key={b.id} cx={b.x - 50} cy={b.y - 50} r={b.r} fill="white" opacity="0.6" />
                      ))}

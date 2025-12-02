@@ -16,7 +16,7 @@ const SolubilityPracticalSim: React.FC = () => {
   const MASS_SOLUTE = 4; // Ammonium Chloride approx
   const CRYSTAL_POINT = 55; // Temp where crystals appear
 
-  const coolingRef = useRef<number>(0);
+  const coolingRef = useRef<number>();
 
   const reset = () => {
     setStep(1);
