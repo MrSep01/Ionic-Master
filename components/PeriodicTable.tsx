@@ -25,13 +25,9 @@ const PeriodicTable: React.FC<PeriodicTableProps> = ({ onSelectIon, allowedCatio
     
     if (ions.length === 0) return; // Not interactable for current level
 
-    if (ions.length === 1) {
-      onSelectIon(ions[0]);
-      setSelectedElement(null);
-    } else {
-      // Open sub-menu for variable charges
-      setSelectedElement(element);
-    }
+    // Always open modal to show charge options, even if only one
+    // This ensures students see the charge (e.g. Na+) before confirming
+    setSelectedElement(element);
   };
 
   // 18 columns, 7 rows generally (simplified)
@@ -132,7 +128,9 @@ const PeriodicTable: React.FC<PeriodicTableProps> = ({ onSelectIon, allowedCatio
                     
                     <h3 className="font-black text-slate-800 mb-1 text-lg sm:text-xl">{selectedElement.name}</h3>
                     <p className="text-slate-500 text-xs sm:text-sm mb-4 sm:mb-6 font-medium">
-                        Select the specific ion charge:
+                        {getAvailableIons(selectedElement.symbol).length > 1 
+                            ? "Select the specific ion charge:" 
+                            : "Confirm ion selection:"}
                     </p>
                     <div className="flex flex-col gap-2 sm:gap-3">
                         {getAvailableIons(selectedElement.symbol).map((ion, idx) => (
@@ -150,7 +148,7 @@ const PeriodicTable: React.FC<PeriodicTableProps> = ({ onSelectIon, allowedCatio
                                     }
                                 `}
                             >
-                                <span className="font-serif text-xl sm:text-2xl">
+                                <span className="font-serif text-xl sm:text-2xl flex items-center">
                                     <ChemicalDisplay symbol={ion.symbol} charge={ion.charge} showCharge={true} />
                                 </span>
                                 <span className="text-xs sm:text-sm font-sans font-bold opacity-60 group-hover:opacity-100 tracking-wide">

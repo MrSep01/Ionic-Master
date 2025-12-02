@@ -11,6 +11,16 @@ export enum DifficultyLevel {
   GRANDMASTER = 'Grandmaster'
 }
 
+export enum GameMode {
+  CAREER = 'CAREER',
+  TRAINING = 'TRAINING'
+}
+
+export interface TrainingConfig {
+    type: 'BUILD' | 'NAME'; // Build Formula or Name Compound
+    pool: 'ALL' | 'SIMPLE' | 'POLYATOMIC' | 'TRANSITION';
+}
+
 // Helper to determine order
 export const LEVEL_ORDER = [
   DifficultyLevel.NOVICE,
@@ -52,7 +62,19 @@ export interface CertificateEntry {
   timestamp: number;
 }
 
+export interface LessonProgress {
+  selections: Record<number, number>;
+  textAnswers: Record<number, string>;
+  validatedInputs: Record<number, boolean>;
+  attempts: Record<number, number>; // Track number of tries per block index
+  score: number; // Final score 0-100
+  isCompleted: boolean;
+}
+
 export interface GameState {
+  nickname?: string; // Student Name
+  gameMode: GameMode;
+  trainingConfig?: TrainingConfig;
   level: DifficultyLevel;
   score: number;
   streak: number;
@@ -70,6 +92,8 @@ export interface GameState {
   notes: string; // Student notebook content
   history: HistoryEntry[]; // Log of synthesized compounds
   certificates: CertificateEntry[]; // Earned certificates
+  completedLessons: string[]; // IDs of completed curriculum lessons
+  lessonProgress: Record<string, LessonProgress>; // Detailed progress per lesson ID
 }
 
 // New types for the UI

@@ -1,16 +1,28 @@
-import React from 'react';
-import { X, Trash2, Save, RotateCcw } from 'lucide-react';
+
+import React, { useState } from 'react';
+import { X, Trash2, Save, RotateCcw, User, Edit2, Check } from 'lucide-react';
 import { DifficultyLevel } from '../types';
 
 interface SettingsModalProps {
   onClose: () => void;
   onReset: () => void;
+  onUpdateNickname: (name: string) => void;
   currentLevel: DifficultyLevel;
   score: number;
+  nickname?: string;
 }
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onReset, currentLevel, score }) => {
-  const [confirmReset, setConfirmReset] = React.useState(false);
+const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onReset, onUpdateNickname, currentLevel, score, nickname = 'Student' }) => {
+  const [confirmReset, setConfirmReset] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [newName, setNewName] = useState(nickname);
+
+  const handleSaveName = () => {
+    if (newName.trim() && newName.length <= 15) {
+        onUpdateNickname(newName.trim());
+        setIsEditingName(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in">
@@ -34,21 +46,47 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onReset, current
         <div className="p-6">
           
           {/* Status Card */}
-          <div className="bg-indigo-50 rounded-2xl p-4 mb-6 border border-indigo-100">
-             <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2">Current Session</h3>
-             <div className="flex justify-between items-end">
+          <div className="bg-indigo-50 rounded-2xl p-4 mb-6 border border-indigo-100 relative">
+             <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2">Student ID</h3>
+             
+             {isEditingName ? (
+                 <div className="flex gap-2 mb-4">
+                     <input 
+                        type="text" 
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                        className="flex-1 px-3 py-1 rounded-lg border-2 border-indigo-200 font-bold text-indigo-900 outline-none focus:border-indigo-500"
+                        autoFocus
+                     />
+                     <button 
+                        onClick={handleSaveName}
+                        className="p-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600"
+                     >
+                        <Check className="w-4 h-4" />
+                     </button>
+                 </div>
+             ) : (
+                 <div className="flex items-center justify-between mb-4 group">
+                    <p className="text-indigo-900 font-black text-2xl">{nickname}</p>
+                    <button 
+                        onClick={() => setIsEditingName(true)}
+                        className="p-1.5 bg-indigo-100 rounded-lg text-indigo-400 opacity-0 group-hover:opacity-100 hover:bg-indigo-200 hover:text-indigo-600 transition-all"
+                    >
+                        <Edit2 className="w-4 h-4" />
+                    </button>
+                 </div>
+             )}
+
+             <div className="flex justify-between items-end border-t border-indigo-100 pt-3">
                 <div>
-                    <p className="text-slate-500 text-sm font-semibold">Level</p>
-                    <p className="text-indigo-900 font-black text-xl">{currentLevel}</p>
+                    <p className="text-slate-500 text-xs font-semibold uppercase">Current Rank</p>
+                    <p className="text-slate-700 font-bold">{currentLevel}</p>
                 </div>
                 <div className="text-right">
-                    <p className="text-slate-500 text-sm font-semibold">Score</p>
-                    <p className="text-indigo-900 font-black text-xl">{score}</p>
+                    <p className="text-slate-500 text-xs font-semibold uppercase">Total Score</p>
+                    <p className="text-slate-700 font-bold">{score}</p>
                 </div>
              </div>
-             <p className="mt-4 text-[10px] text-indigo-400 flex items-center gap-1.5 font-medium">
-                <Save className="w-3 h-3" /> Progress is saved automatically to this device.
-             </p>
           </div>
 
           <div className="space-y-4">

@@ -1,8 +1,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Ion, IonType, DifficultyLevel } from '../types';
-import { Plus, Minus, Beaker, Check, X, ArrowRight, Zap, ChevronDown } from 'lucide-react';
+import { Plus, Minus, Beaker, Check, X, ArrowRight, Zap, ChevronDown, Map, Lightbulb } from 'lucide-react';
 import ChemicalDisplay from './ChemicalDisplay';
+import BlueprintGuide from './BlueprintGuide';
+import TrainingActiveGuide from './TrainingActiveGuide';
 
 interface WorkstationProps {
   level: DifficultyLevel;
@@ -10,15 +12,17 @@ interface WorkstationProps {
   anion: Ion | null;
   cationCount: number;
   anionCount: number;
-  cationOptions?: string[]; // For GM level
-  anionOptions?: string[];  // For GM level
+  cationOptions?: string[]; // For GM/Naming level
+  anionOptions?: string[];  // For GM/Naming level
   onUpdateCount: (type: IonType, change: number) => void;
-  onSelectName?: (type: IonType, name: string) => void; // For GM level
+  onSelectName?: (type: IonType, name: string) => void; // For GM/Naming level
   onSubmit: () => void;
   onNext: () => void;
   onClear: () => void;
   isSubmitting: boolean;
   gameStatus: 'playing' | 'success' | 'error';
+  isNamingMode?: boolean; 
+  isTrainingMode?: boolean; // NEW PROP
   children?: React.ReactNode;
 }
 
@@ -37,14 +41,17 @@ const Workstation: React.FC<WorkstationProps> = ({
   onClear,
   isSubmitting,
   gameStatus,
+  isNamingMode = false,
+  isTrainingMode = false,
   children
 }) => {
   const [animationStage, setAnimationStage] = useState<'idle' | 'reacting' | 'merged'>('idle');
   const [showCationOptions, setShowCationOptions] = useState(false);
   const [showAnionOptions, setShowAnionOptions] = useState(false);
+  const [showBlueprint, setShowBlueprint] = useState(false);
   const feedbackRef = useRef<HTMLDivElement>(null);
 
-  const isGrandmaster = level === DifficultyLevel.GRANDMASTER;
+  const useMultipleChoice = level === DifficultyLevel.GRANDMASTER || isNamingMode;
 
   // Reset animation when game goes back to playing or inputs change
   useEffect(() => {
@@ -52,6 +59,7 @@ const Workstation: React.FC<WorkstationProps> = ({
       setAnimationStage('idle');
       setShowCationOptions(false);
       setShowAnionOptions(false);
+      setShowBlueprint(false);
     } else if (gameStatus === 'success') {
       // Start reaction sequence
       setAnimationStage('reacting');
@@ -73,8 +81,8 @@ const Workstation: React.FC<WorkstationProps> = ({
   };
 
   const netCharge = calculateNetCharge();
-  // In Grandmaster, we balance check is implicitly true if names are selected, validation happens in App
-  const isBalanced = isGrandmaster 
+  // In Naming Mode/GM, balance check is implicitly true if names are selected
+  const isBalanced = useMultipleChoice 
     ? (cation && anion) 
     : (cation && anion && netCharge === 0);
     
@@ -84,8 +92,8 @@ const Workstation: React.FC<WorkstationProps> = ({
   const renderFinalFormula = () => {
     if (!cation || !anion) return null;
 
-    // IN GRANDMASTER: Result is the NAME of the compound (since target was formula)
-    if (isGrandmaster) {
+    // IN NAMING MODE: Result is the NAME of the compound (since target was formula)
+    if (useMultipleChoice) {
         return (
              <div className="flex flex-col items-center animate-in zoom-in duration-500">
                 <span className="text-4xl sm:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-emerald-600 to-teal-500 text-center leading-tight">
@@ -142,7 +150,7 @@ const Workstation: React.FC<WorkstationProps> = ({
         <div className={`absolute inset-0 bg-white pointer-events-none transition-opacity duration-500 ease-out z-20 ${animationStage === 'reacting' ? 'opacity-90' : 'opacity-0'}`}></div>
 
         <h3 className={`text-[9px] sm:text-xs uppercase tracking-[0.2em] font-bold mb-2 sm:mb-4 relative z-10 transition-colors ${animationStage === 'merged' ? 'text-emerald-600' : 'text-slate-400'}`}>
-            {animationStage === 'merged' ? 'Success!' : isGrandmaster ? 'Nomenclature Chamber' : 'Reaction Chamber'}
+            {animationStage === 'merged' ? 'Success!' : useMultipleChoice ? 'Nomenclature Chamber' : 'Reaction Chamber'}
         </h3>
         
         <div className="flex items-center justify-center gap-1 sm:gap-6 relative z-10 w-full">
@@ -152,7 +160,7 @@ const Workstation: React.FC<WorkstationProps> = ({
                     <Zap className="w-4 h-4 sm:w-6 sm:h-6 text-slate-300" />
                 </div>
                 <span className="text-slate-400 font-mono text-[10px] sm:text-xs font-bold">
-                    {isGrandmaster ? 'Identify Components' : 'Select Ions'}
+                    {useMultipleChoice ? 'Identify Components' : 'Select Ions'}
                 </span>
             </div>
           ) : animationStage === 'merged' ? (
@@ -164,10 +172,10 @@ const Workstation: React.FC<WorkstationProps> = ({
                 
                 {/* Cation Display */}
                 {cation && (
-                    <div className="flex flex-col items-center animate-in zoom-in duration-300">
-                         {isGrandmaster ? (
-                             // GM Mode: Show Name
-                             <div className="text-lg sm:text-2xl md:text-3xl font-black text-cyan-600 px-3 py-2 bg-white rounded-lg border-2 border-cyan-100 shadow-sm">
+                    <div className="flex flex-col items-center animate-in zoom-in duration-300 min-w-0 shrink-1">
+                         {useMultipleChoice ? (
+                             // Naming Mode: Show Name
+                             <div className="text-base sm:text-xl md:text-2xl font-black text-cyan-600 px-2 sm:px-3 py-1 sm:py-2 bg-white rounded-lg border-2 border-cyan-100 shadow-sm max-w-[120px] sm:max-w-none truncate">
                                 {cation.name}
                              </div>
                          ) : (
@@ -182,7 +190,7 @@ const Workstation: React.FC<WorkstationProps> = ({
                              </div>
                          )}
                          
-                         {cationCount > 1 && !isGrandmaster && (
+                         {cationCount > 1 && !useMultipleChoice && (
                              <div className="text-[9px] sm:text-xs text-cyan-900 bg-cyan-200 font-bold px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full mt-1 sm:mt-2">
                                 × {cationCount}
                              </div>
@@ -190,14 +198,14 @@ const Workstation: React.FC<WorkstationProps> = ({
                     </div>
                 )}
                 
-                {cation && anion && <Plus className="w-4 h-4 sm:w-6 sm:h-6 text-slate-300 mx-0.5" />}
+                {cation && anion && <Plus className="w-4 h-4 sm:w-6 sm:h-6 text-slate-300 mx-0.5 shrink-0" />}
 
                 {/* Anion Display */}
                 {anion && (
-                    <div className="flex flex-col items-center animate-in zoom-in duration-300">
-                         {isGrandmaster ? (
-                             // GM Mode: Show Name
-                             <div className="text-lg sm:text-2xl md:text-3xl font-black text-emerald-600 px-3 py-2 bg-white rounded-lg border-2 border-emerald-100 shadow-sm">
+                    <div className="flex flex-col items-center animate-in zoom-in duration-300 min-w-0 shrink-1">
+                         {useMultipleChoice ? (
+                             // Naming Mode: Show Name
+                             <div className="text-base sm:text-xl md:text-2xl font-black text-emerald-600 px-2 sm:px-3 py-1 sm:py-2 bg-white rounded-lg border-2 border-emerald-100 shadow-sm max-w-[120px] sm:max-w-none truncate">
                                 {anion.name}
                              </div>
                          ) : (
@@ -212,7 +220,7 @@ const Workstation: React.FC<WorkstationProps> = ({
                              </div>
                          )}
                          
-                         {anionCount > 1 && !isGrandmaster && (
+                         {anionCount > 1 && !useMultipleChoice && (
                              <div className="text-[9px] sm:text-xs text-emerald-900 bg-emerald-200 font-bold px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full mt-1 sm:mt-2">
                                 × {anionCount}
                              </div>
@@ -223,7 +231,7 @@ const Workstation: React.FC<WorkstationProps> = ({
           )}
         </div>
 
-        {hasSelection && animationStage !== 'merged' && !isGrandmaster && (
+        {hasSelection && animationStage !== 'merged' && !useMultipleChoice && (
             <div className={`mt-2 sm:mt-4 inline-flex items-center gap-2 px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-black tracking-wide transition-all duration-300 border shadow-sm ${netCharge === 0 ? 'bg-emerald-100 border-emerald-200 text-emerald-700' : 'bg-rose-100 border-rose-200 text-rose-700'}`}>
                 Net: {netCharge > 0 ? `+${netCharge}` : netCharge}
                 {netCharge === 0 ? <Check className="w-3 h-3 ml-1" /> : <X className="w-3 h-3 ml-1" />}
@@ -233,6 +241,29 @@ const Workstation: React.FC<WorkstationProps> = ({
 
       {/* Controls */}
       <div className="p-2 sm:p-4 md:p-6 flex flex-col justify-center gap-2 sm:gap-4 relative bg-white">
+        
+        {/* NEW: Training Active Guide */}
+        {isTrainingMode && !isNamingMode && gameStatus === 'playing' && (
+             <TrainingActiveGuide cation={cation} anion={anion} netCharge={netCharge} />
+        )}
+
+        {/* Helper Toggle Button */}
+        {hasSelection && !useMultipleChoice && gameStatus === 'playing' && (
+            <div className="flex justify-end -mt-2 mb-1">
+                <button
+                    onClick={() => setShowBlueprint(!showBlueprint)}
+                    className="flex items-center gap-1 text-[10px] sm:text-xs font-bold text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2 py-1 rounded-lg transition-colors"
+                >
+                    {showBlueprint ? 'Hide Steps' : 'Show Blueprint'}
+                    {showBlueprint ? <Map className="w-3 h-3" /> : <Lightbulb className="w-3 h-3" />}
+                </button>
+            </div>
+        )}
+
+        {/* Blueprint Guide Injection */}
+        {showBlueprint && cation && anion && (
+            <BlueprintGuide cation={cation} anion={anion} onClose={() => setShowBlueprint(false)} />
+        )}
         
         {/* Cation Control */}
         <div className="flex items-center justify-between p-2 sm:p-3 md:p-4 bg-white rounded-xl border-2 border-slate-100 hover:border-cyan-300 shadow-sm hover:shadow-lg hover:shadow-cyan-100 transition-all group touch-manipulation relative">
@@ -244,16 +275,16 @@ const Workstation: React.FC<WorkstationProps> = ({
                         <Plus className="w-5 h-5 opacity-30" />
                     )}
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                     <p className="text-[9px] sm:text-[10px] text-cyan-600 font-black uppercase tracking-wider mb-0.5">Cation</p>
-                    <p className="text-slate-800 font-bold text-xs sm:text-base leading-tight truncate">
+                    <p className="text-slate-800 font-bold text-xs sm:text-base leading-tight truncate pr-1">
                         {cation ? cation.name : 'Select'}
                     </p>
                 </div>
             </div>
             
             {/* Control Buttons (Count vs Select Name) */}
-            {isGrandmaster ? (
+            {useMultipleChoice ? (
                 <div className="relative">
                     <button 
                         onClick={() => {
@@ -283,7 +314,7 @@ const Workstation: React.FC<WorkstationProps> = ({
                     )}
                 </div>
             ) : (
-                <div className="flex items-center gap-1 sm:gap-2 bg-slate-50 p-1 rounded-lg border border-slate-100">
+                <div className="flex items-center gap-1 sm:gap-2 bg-slate-50 p-1 rounded-lg border border-slate-100 shrink-0">
                     <button 
                         onClick={() => onUpdateCount(IonType.CATION, -1)}
                         disabled={!cation || cationCount <= 1 || gameStatus === 'success'}
@@ -327,16 +358,16 @@ const Workstation: React.FC<WorkstationProps> = ({
                         <Minus className="w-5 h-5 opacity-30" />
                     )}
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                     <p className="text-[9px] sm:text-[10px] text-emerald-600 font-black uppercase tracking-wider mb-0.5">Anion</p>
-                    <p className="text-slate-800 font-bold text-xs sm:text-base leading-tight truncate">
+                    <p className="text-slate-800 font-bold text-xs sm:text-base leading-tight truncate pr-1">
                         {anion ? anion.name : 'Select'}
                     </p>
                 </div>
             </div>
             
             {/* Control Buttons (Count vs Select Name) */}
-            {isGrandmaster ? (
+            {useMultipleChoice ? (
                 <div className="relative">
                     <button 
                         onClick={() => {
@@ -366,7 +397,7 @@ const Workstation: React.FC<WorkstationProps> = ({
                     )}
                 </div>
             ) : (
-                <div className="flex items-center gap-1 sm:gap-2 bg-slate-50 p-1 rounded-lg border border-slate-100">
+                <div className="flex items-center gap-1 sm:gap-2 bg-slate-50 p-1 rounded-lg border border-slate-100 shrink-0">
                     <button 
                         onClick={() => onUpdateCount(IonType.ANION, -1)}
                         disabled={!anion || anionCount <= 1 || gameStatus === 'success'}
@@ -420,7 +451,7 @@ const Workstation: React.FC<WorkstationProps> = ({
                     onClick={onNext}
                     className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl sm:rounded-2xl font-black text-white shadow-xl shadow-emerald-500/30 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 transform hover:-translate-y-1 transition-all animate-in fade-in text-sm sm:text-base active:scale-[0.98]"
                 >
-                    NEXT LEVEL <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                    {level === DifficultyLevel.GRANDMASTER || isNamingMode ? 'NEXT CHALLENGE' : 'NEXT CHALLENGE'} <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
             ) : (
                 <button 
@@ -436,7 +467,7 @@ const Workstation: React.FC<WorkstationProps> = ({
                     {isSubmitting ? 'ANALYZING...' : (
                         <>
                             <Beaker className="w-5 h-5 group-hover:rotate-12 transition-transform" /> 
-                            {isGrandmaster ? 'IDENTIFY' : 'SYNTHESIZE'}
+                            {useMultipleChoice ? 'IDENTIFY' : 'SYNTHESIZE'}
                         </>
                     )}
                 </button>

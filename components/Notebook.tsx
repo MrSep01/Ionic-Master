@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { NotebookPen, Book, AlertCircle, History, Award, ScrollText, PenLine } from 'lucide-react';
+import { NotebookPen, Book, AlertCircle, History, Award, ScrollText, PenLine, User } from 'lucide-react';
 import { HistoryEntry, CertificateEntry, DifficultyLevel } from '../types';
 import ChemicalDisplay from './ChemicalDisplay';
 
@@ -10,11 +10,12 @@ interface NotebookProps {
   history: HistoryEntry[];
   certificates: CertificateEntry[];
   onViewCertificate: (level: DifficultyLevel) => void;
+  nickname: string;
 }
 
 type Tab = 'notes' | 'log' | 'achievements' | 'reference';
 
-const Notebook: React.FC<NotebookProps> = ({ notes, onUpdateNotes, history, certificates, onViewCertificate }) => {
+const Notebook: React.FC<NotebookProps> = ({ notes, onUpdateNotes, history, certificates, onViewCertificate, nickname }) => {
   const [activeTab, setActiveTab] = useState<Tab>('notes');
 
   const renderReference = () => (
@@ -92,30 +93,39 @@ const Notebook: React.FC<NotebookProps> = ({ notes, onUpdateNotes, history, cert
   );
 
   const renderAchievements = () => (
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in slide-in-from-right-2">
-          {certificates.length === 0 ? (
-              <div className="col-span-full text-center py-12 bg-white rounded-3xl border-2 border-dashed border-slate-200">
-                  <Award className="w-12 h-12 text-slate-200 mx-auto mb-3" />
-                  <p className="text-slate-400 font-medium">No certificates earned yet.</p>
-                  <p className="text-xs text-slate-300 mt-1">Master a level to earn your first award!</p>
-              </div>
-          ) : (
-              certificates.map((cert, idx) => (
-                  <button 
-                    key={idx}
-                    onClick={() => onViewCertificate(cert.level)}
-                    className="bg-white p-6 rounded-2xl border-2 border-amber-100 shadow-sm hover:shadow-lg hover:border-amber-300 transition-all group text-left relative overflow-hidden"
-                  >
-                      <div className="absolute -right-4 -top-4 w-20 h-20 bg-amber-50 rounded-full group-hover:bg-amber-100 transition-colors"></div>
-                      <Award className="w-8 h-8 text-amber-500 mb-3 relative z-10" />
-                      <h3 className="font-black text-slate-800 text-lg relative z-10">{cert.level} Chemist</h3>
-                      <p className="text-xs text-slate-400 font-medium relative z-10">Earned on {new Date(cert.timestamp).toLocaleDateString()}</p>
-                      <div className="mt-4 text-xs font-bold text-amber-600 flex items-center gap-1 group-hover:gap-2 transition-all">
-                          View Certificate <ScrollText className="w-3 h-3" />
-                      </div>
-                  </button>
-              ))
+      <div className="space-y-4 animate-in fade-in slide-in-from-right-2">
+          {certificates.length > 0 && (
+             <div className="flex items-center gap-2 px-2 py-1 bg-amber-50 rounded-lg w-fit border border-amber-100">
+                <User className="w-3 h-3 text-amber-500" />
+                <span className="text-xs font-bold text-amber-700 uppercase tracking-wide">Awarded to {nickname}</span>
+             </div>
           )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {certificates.length === 0 ? (
+                  <div className="col-span-full text-center py-12 bg-white rounded-3xl border-2 border-dashed border-slate-200">
+                      <Award className="w-12 h-12 text-slate-200 mx-auto mb-3" />
+                      <p className="text-slate-400 font-medium">No certificates earned yet.</p>
+                      <p className="text-xs text-slate-300 mt-1">Master a level to earn your first award!</p>
+                  </div>
+              ) : (
+                  certificates.map((cert, idx) => (
+                      <button 
+                        key={idx}
+                        onClick={() => onViewCertificate(cert.level)}
+                        className="bg-white p-6 rounded-2xl border-2 border-amber-100 shadow-sm hover:shadow-lg hover:border-amber-300 transition-all group text-left relative overflow-hidden"
+                      >
+                          <div className="absolute -right-4 -top-4 w-20 h-20 bg-amber-50 rounded-full group-hover:bg-amber-100 transition-colors"></div>
+                          <Award className="w-8 h-8 text-amber-500 mb-3 relative z-10" />
+                          <h3 className="font-black text-slate-800 text-lg relative z-10">{cert.level} Chemist</h3>
+                          <p className="text-xs text-slate-400 font-medium relative z-10">Earned on {new Date(cert.timestamp).toLocaleDateString()}</p>
+                          <div className="mt-4 text-xs font-bold text-amber-600 flex items-center gap-1 group-hover:gap-2 transition-all">
+                              View Certificate <ScrollText className="w-3 h-3" />
+                          </div>
+                      </button>
+                  ))
+              )}
+          </div>
       </div>
   );
 

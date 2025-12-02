@@ -8,9 +8,10 @@ interface CertificateProps {
   onNext: () => void;
   onClose: () => void;
   hasNextLevel: boolean;
+  nickname: string;
 }
 
-const Certificate: React.FC<CertificateProps> = ({ level, onNext, onClose, hasNextLevel }) => {
+const Certificate: React.FC<CertificateProps> = ({ level, onNext, onClose, hasNextLevel, nickname }) => {
   
   const handlePrint = () => {
     window.print();
@@ -40,8 +41,16 @@ const Certificate: React.FC<CertificateProps> = ({ level, onNext, onClose, hasNe
                 Certificate of Mastery
             </h1>
             
+            <p className="text-slate-500 italic text-lg mb-4 print:text-slate-600">
+                This certifies that
+            </p>
+
+            <h3 className="text-3xl font-black text-slate-800 mb-6 border-b-2 border-slate-200 inline-block px-8 pb-1 uppercase tracking-wider print:text-black">
+                {nickname}
+            </h3>
+
             <p className="text-slate-500 italic text-lg mb-8 print:text-slate-600">
-                This certifies that the student has successfully mastered the
+                has successfully mastered the
             </p>
 
             <div className="mb-8 py-4 px-12 border-y-2 border-slate-100 bg-slate-50 w-full print:bg-white print:border-slate-300">

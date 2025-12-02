@@ -1,4 +1,5 @@
 
+
 import { Ion, IonType, DifficultyLevel, PeriodicElement, OxyanionRule } from './types';
 
 export const WINS_TO_ADVANCE = 5;
@@ -7,6 +8,7 @@ export const WINS_TO_ADVANCE = 5;
 
 export const CATIONS: Ion[] = [
   // Group 1
+  { symbol: 'H', name: 'Hydrogen', charge: 1, type: IonType.CATION, elementSymbol: 'H' },
   { symbol: 'Li', name: 'Lithium', charge: 1, type: IonType.CATION, elementSymbol: 'Li' },
   { symbol: 'Na', name: 'Sodium', charge: 1, type: IonType.CATION, elementSymbol: 'Na' },
   { symbol: 'K', name: 'Potassium', charge: 1, type: IonType.CATION, elementSymbol: 'K' },
@@ -54,6 +56,8 @@ export const ANIONS: Ion[] = [
   // Group 15
   { symbol: 'N', name: 'Nitride', charge: -3, type: IonType.ANION, elementSymbol: 'N' },
   { symbol: 'P', name: 'Phosphide', charge: -3, type: IonType.ANION, elementSymbol: 'P' },
+  // Group 14
+  { symbol: 'C', name: 'Carbide', charge: -4, type: IonType.ANION, elementSymbol: 'C' },
   
   // Polyatomic Anions (-1)
   { symbol: 'C2H3O2', name: 'Acetate', charge: -1, type: IonType.ANION, isPolyatomic: true },
@@ -178,17 +182,18 @@ export const OXYANION_RULES: OxyanionRule[] = [
 
 export const LEVEL_CONFIG = {
   [DifficultyLevel.NOVICE]: {
-    description: "Guided learning. Simple monoatomic ions only.",
+    description: "Guided learning. Monoatomic ions and metals.",
     ions: {
-      cations: CATIONS.filter(c => c.charge === 1 || (c.charge === 2 && !['Fe','Cu', 'Pb', 'Sn', 'Hg', 'Mn'].includes(c.elementSymbol || ''))),
+      // Allow all monoatomic cations (including variable charges like Cu+ and Cu2+) + Hg2
+      cations: CATIONS.filter(c => !c.isPolyatomic || c.symbol === 'Hg2'),
       anions: ANIONS.filter(a => !a.isPolyatomic)
     }
   },
   [DifficultyLevel.APPRENTICE]: {
     description: "Charge balancing. Introduction of common polyatomic ions.",
     ions: {
-      cations: CATIONS.filter(c => !['Fe', 'Cu', 'Pb', 'Sn', 'Hg', 'Mn'].includes(c.elementSymbol || '') || c.symbol === 'Zn'),
-      anions: ANIONS.filter(a => !a.isPolyatomic || ['OH', 'NO3', 'SO4', 'CO3', 'PO4', 'NH4'].includes(a.symbol))
+      cations: CATIONS, // Allow all cations (superset of Novice)
+      anions: ANIONS.filter(a => !a.isPolyatomic || ['OH', 'NO3', 'SO4', 'CO3', 'PO4', 'NH4', 'C2H3O2', 'HCO3'].includes(a.symbol))
     }
   },
   [DifficultyLevel.MASTER]: {
