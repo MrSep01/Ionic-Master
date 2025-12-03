@@ -1,4 +1,5 @@
 
+
 import { Unit } from './types';
 
 export const IGCSE_UNIT_5: Unit = {
@@ -334,69 +335,791 @@ export const IGCSE_UNIT_5: Unit = {
           ]
         },
         {
+          id: '5.2b-transition',
+          title: '5.2b: Transition Metals & Variable Charges',
+          blocks: [
+            { 
+                type: 'learning-objectives', 
+                items: ['5.2 know the charges of these ions: Ag⁺, Cu²⁺, Fe²⁺, Fe³⁺, Pb²⁺, Zn²⁺']
+            },
+            { type: 'paragraph', content: 'Transition metals (the middle block) can form ions with different charges. We use **Roman Numerals** in the name to specify the charge (Systematic Name). Historically, special suffixes like **-ous** (lower charge) and **-ic** (higher charge) were used.' },
+            
+            { type: 'header', content: 'Variable Valency Table' },
+            { type: 'paragraph', content: `
+                <div class="overflow-x-auto my-6 border-2 border-indigo-100 rounded-xl shadow-sm">
+                  <table class="w-full text-sm text-left border-collapse">
+                    <thead class="bg-indigo-50 text-indigo-900 font-black uppercase text-xs tracking-wider">
+                      <tr>
+                        <th class="p-3 border-b border-indigo-100">Metal</th>
+                        <th class="p-3 border-b border-indigo-100 text-center">Ion</th>
+                        <th class="p-3 border-b border-indigo-100">Systematic Name</th>
+                        <th class="p-3 border-b border-indigo-100 text-rose-600">Traditional Name</th>
+                      </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                      <tr class="hover:bg-slate-50"><td class="p-3 font-bold text-slate-700 border-b border-slate-100">Chromium</td><td class="p-3 text-center border-b border-slate-100"><div class="font-mono text-blue-600">Cr²⁺</div><div class="font-mono text-emerald-600">Cr³⁺</div></td><td class="p-3 border-b border-slate-100">Chromium(II)<br>Chromium(III)</td><td class="p-3 border-b border-slate-100 text-slate-500 font-serif">Chrom<strong class="text-rose-500">ous</strong><br>Chrom<strong class="text-rose-500">ic</strong></td></tr>
+                      <tr class="hover:bg-slate-50"><td class="p-3 font-bold text-slate-700 border-b border-slate-100">Iron</td><td class="p-3 text-center border-b border-slate-100"><div class="font-mono text-blue-600">Fe²⁺</div><div class="font-mono text-emerald-600">Fe³⁺</div></td><td class="p-3 border-b border-slate-100">Iron(II)<br>Iron(III)</td><td class="p-3 border-b border-slate-100 text-slate-500 font-serif">Ferr<strong class="text-rose-500">ous</strong><br>Ferr<strong class="text-rose-500">ic</strong></td></tr>
+                      <tr class="hover:bg-slate-50"><td class="p-3 font-bold text-slate-700 border-b border-slate-100">Cobalt</td><td class="p-3 text-center border-b border-slate-100"><div class="font-mono text-blue-600">Co²⁺</div><div class="font-mono text-emerald-600">Co³⁺</div></td><td class="p-3 border-b border-slate-100">Cobalt(II)<br>Cobalt(III)</td><td class="p-3 border-b border-slate-100 text-slate-500 font-serif">Cobalt<strong class="text-rose-500">ous</strong><br>Cobalt<strong class="text-rose-500">ic</strong></td></tr>
+                      <tr class="hover:bg-slate-50"><td class="p-3 font-bold text-slate-700 border-b border-slate-100">Copper</td><td class="p-3 text-center border-b border-slate-100"><div class="font-mono text-blue-600">Cu⁺</div><div class="font-mono text-emerald-600">Cu²⁺</div></td><td class="p-3 border-b border-slate-100">Copper(I)<br>Copper(II)</td><td class="p-3 border-b border-slate-100 text-slate-500 font-serif">Cupr<strong class="text-rose-500">ous</strong><br>Cupr<strong class="text-rose-500">ic</strong></td></tr>
+                      <tr class="hover:bg-slate-50"><td class="p-3 font-bold text-slate-700 border-b border-slate-100">Tin</td><td class="p-3 text-center border-b border-slate-100"><div class="font-mono text-blue-600">Sn²⁺</div><div class="font-mono text-emerald-600">Sn⁴⁺</div></td><td class="p-3 border-b border-slate-100">Tin(II)<br>Tin(IV)</td><td class="p-3 border-b border-slate-100 text-slate-500 font-serif">Stann<strong class="text-rose-500">ous</strong><br>Stann<strong class="text-rose-500">ic</strong></td></tr>
+                      <tr class="hover:bg-slate-50"><td class="p-3 font-bold text-slate-700 border-b border-slate-100">Mercury</td><td class="p-3 text-center border-b border-slate-100"><div class="font-mono text-blue-600">Hg₂²⁺</div><div class="font-mono text-emerald-600">Hg²⁺</div></td><td class="p-3 border-b border-slate-100">Mercury(I)<br>Mercury(II)</td><td class="p-3 border-b border-slate-100 text-slate-500 font-serif">Mercur<strong class="text-rose-500">ous</strong><br>Mercur<strong class="text-rose-500">ic</strong></td></tr>
+                      <tr class="hover:bg-slate-50"><td class="p-3 font-bold text-slate-700">Lead</td><td class="p-3 text-center"><div class="font-mono text-blue-600">Pb²⁺</div><div class="font-mono text-emerald-600">Pb⁴⁺</div></td><td class="p-3">Lead(II)<br>Lead(IV)</td><td class="p-3 text-slate-500 font-serif">Plumb<strong class="text-rose-500">ous</strong><br>Plumb<strong class="text-rose-500">ic</strong></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+            `},
+
+            { type: 'exam-hint', content: '**Traditional Naming Rule:** The suffix **-ous** is used for the ion with the **lower** charge (e.g., Ferrous Fe²⁺), while **-ic** is used for the **higher** charge (e.g., Ferric Fe³⁺).' },
+
+            { type: 'header', content: 'The Exceptions' },
+            { type: 'paragraph', content: 'Two metals you must memorize do NOT use Roman numerals because they generally only have one stable ion:' },
+            { type: 'key-vocab', vocabItems: [
+                { term: 'Zinc', definition: 'Always forms Zn²⁺' },
+                { term: 'Silver', definition: 'Always forms Ag⁺' }
+            ]},
+            
+            // --- NEW CHECKPOINTS ---
+            { type: 'header', content: 'Naming Knowledge Check' },
+            
+            { type: 'checkpoint', checkpoint: {
+                question: 'What does the Roman numeral in Iron(III) represent?',
+                options: ['The mass number', 'The number of atoms', 'The charge of the ion (+3)', 'The period number'],
+                correctIndex: 2,
+                explanation: 'The Roman numeral indicates the positive charge of the transition metal ion.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'Which of these ions is also known as the "Cuprous" ion?',
+                options: ['Cu⁺', 'Cu²⁺', 'Co²⁺', 'Cr³⁺'],
+                correctIndex: 0,
+                explanation: 'Cuprous uses the -ous suffix, indicating the lower charge for Copper, which is +1.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'What is the correct systematic name for Sn⁴⁺?',
+                options: ['Tin(II)', 'Tin(IV)', 'Stannous', 'Stannic'],
+                correctIndex: 1,
+                explanation: 'Sn is Tin. The charge is 4+, so the systematic name uses Roman numeral IV.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'Which suffix indicates the HIGHER charge in the traditional naming system?',
+                options: ['-ous', '-ic', '-ate', '-ide'],
+                correctIndex: 1,
+                explanation: '-ic is for the higher charge (e.g., Ferric), while -ous is for the lower charge (e.g., Ferrous).'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'What is the formula for the Mercury(I) ion?',
+                options: ['Hg⁺', 'Hg²⁺', 'Hg₂²⁺', 'Hg₂⁺'],
+                correctIndex: 2,
+                explanation: 'Mercury(I) is unique; it exists as a diatomic ion Hg₂²⁺ (a pair of mercury atoms with a total +2 charge).'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'Which transition metal ion typically does NOT use a Roman numeral?',
+                options: ['Iron', 'Copper', 'Zinc', 'Lead'],
+                correctIndex: 2,
+                explanation: 'Zinc almost always forms the Zn²⁺ ion, so Roman numerals are not usually required.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'The traditional name "Plumbous" refers to which ion?',
+                options: ['Pb²⁺', 'Pb⁴⁺', 'Pt²⁺', 'Po²⁺'],
+                correctIndex: 0,
+                explanation: 'Plumbous refers to Lead (Plumbum) with the lower charge (+2).'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'What is the charge of the Cobalt ion in Cobalt(III) chloride?',
+                options: ['+1', '+2', '+3', '-3'],
+                correctIndex: 2,
+                explanation: 'The Roman numeral (III) explicitly states the charge is +3.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'Which ion corresponds to the traditional name "Stannous"?',
+                options: ['Sn²⁺', 'Sn⁴⁺', 'Sb³⁺', 'Sr²⁺'],
+                correctIndex: 0,
+                explanation: 'Stannous refers to Tin (Stannum) with the lower charge (+2).'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'What is the traditional name for Copper(II)?',
+                options: ['Cuprous', 'Cupric', 'Cobaltous', 'Chromic'],
+                correctIndex: 1,
+                explanation: 'Copper(II) is the higher charge state for Copper, so it uses the -ic suffix (Cupric).'
+            }}
+          ]
+        },
+        {
+          id: '5.2c-polyatomic',
+          title: '5.2c: Polyatomic Ions & Naming Rules',
+          blocks: [
+            { 
+                type: 'learning-objectives', 
+                items: [
+                    '5.2 know the charges of H⁺, OH⁻, NH₄⁺, CO₃²⁻, NO₃⁻, SO₄²⁻',
+                    'Understand the patterns in naming oxyanions (-ate vs -ite)'
+                ]
+            },
+            { type: 'header', content: 'What is a Polyatomic Ion?' },
+            { type: 'paragraph', content: 'A **Polyatomic Ion** (or "Molecular Ion") is a group of atoms covalently bonded together that behaves like a single unit with an overall charge. Think of them as a "team" of atoms.' },
+            
+            { type: 'header', content: 'The Professional\'s List' },
+            { type: 'paragraph', content: 'While IGCSE focuses on a few key ions, Engineers, Doctors, and Chemists encounter many more. Mastering this list gives you a significant advantage.' },
+            
+            { type: 'paragraph', content: `
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 my-6">
+                    <!-- -1 Charge -->
+                    <div class="border-2 border-purple-200 rounded-xl overflow-hidden shadow-sm">
+                        <div class="bg-purple-100 px-4 py-2 font-black text-purple-800 text-center uppercase text-sm tracking-wide">Charge -1</div>
+                        <table class="w-full text-sm">
+                            <tbody class="divide-y divide-purple-50">
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Hydroxide</td><td class="px-3 py-1 text-right font-mono text-purple-600">OH⁻</td></tr>
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Nitrate</td><td class="px-3 py-1 text-right font-mono text-purple-600">NO₃⁻</td></tr>
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Nitrite</td><td class="px-3 py-1 text-right font-mono text-purple-600">NO₂⁻</td></tr>
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Cyanide</td><td class="px-3 py-1 text-right font-mono text-purple-600">CN⁻</td></tr>
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Permanganate</td><td class="px-3 py-1 text-right font-mono text-purple-600">MnO₄⁻</td></tr>
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Acetate</td><td class="px-3 py-1 text-right font-mono text-purple-600">C₂H₃O₂⁻</td></tr>
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Bicarbonate</td><td class="px-3 py-1 text-right font-mono text-purple-600">HCO₃⁻</td></tr>
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Chlorate</td><td class="px-3 py-1 text-right font-mono text-purple-600">ClO₃⁻</td></tr>
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Perchlorate</td><td class="px-3 py-1 text-right font-mono text-purple-600">ClO₄⁻</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- -2 Charge -->
+                    <div class="border-2 border-orange-200 rounded-xl overflow-hidden shadow-sm">
+                        <div class="bg-orange-100 px-4 py-2 font-black text-orange-800 text-center uppercase text-sm tracking-wide">Charge -2</div>
+                        <table class="w-full text-sm">
+                            <tbody class="divide-y divide-orange-50">
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Carbonate</td><td class="px-3 py-1 text-right font-mono text-orange-600">CO₃²⁻</td></tr>
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Sulfate</td><td class="px-3 py-1 text-right font-mono text-orange-600">SO₄²⁻</td></tr>
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Sulfite</td><td class="px-3 py-1 text-right font-mono text-orange-600">SO₃²⁻</td></tr>
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Chromate</td><td class="px-3 py-1 text-right font-mono text-orange-600">CrO₄²⁻</td></tr>
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Dichromate</td><td class="px-3 py-1 text-right font-mono text-orange-600">Cr₂O₇²⁻</td></tr>
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Oxalate</td><td class="px-3 py-1 text-right font-mono text-orange-600">C₂O₄²⁻</td></tr>
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Peroxide</td><td class="px-3 py-1 text-right font-mono text-orange-600">O₂²⁻</td></tr>
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Thiosulfate</td><td class="px-3 py-1 text-right font-mono text-orange-600">S₂O₃²⁻</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- -3 Charge -->
+                    <div class="border-2 border-yellow-200 rounded-xl overflow-hidden shadow-sm">
+                        <div class="bg-yellow-100 px-4 py-2 font-black text-yellow-800 text-center uppercase text-sm tracking-wide">Charge -3</div>
+                        <table class="w-full text-sm">
+                            <tbody class="divide-y divide-yellow-50">
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Phosphate</td><td class="px-3 py-1 text-right font-mono text-yellow-600">PO₄³⁻</td></tr>
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Phosphite</td><td class="px-3 py-1 text-right font-mono text-yellow-600">PO₃³⁻</td></tr>
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Arsenate</td><td class="px-3 py-1 text-right font-mono text-yellow-600">AsO₄³⁻</td></tr>
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Borate</td><td class="px-3 py-1 text-right font-mono text-yellow-600">BO₃³⁻</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- +1 Charge -->
+                    <div class="border-2 border-emerald-200 rounded-xl overflow-hidden shadow-sm h-min">
+                        <div class="bg-emerald-100 px-4 py-2 font-black text-emerald-800 text-center uppercase text-sm tracking-wide">Charge +1</div>
+                        <table class="w-full text-sm">
+                            <tbody class="divide-y divide-emerald-50">
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Ammonium</td><td class="px-3 py-1 text-right font-mono text-emerald-600">NH₄⁺</td></tr>
+                                <tr><td class="px-3 py-1 font-bold text-slate-700">Hydronium</td><td class="px-3 py-1 text-right font-mono text-emerald-600">H₃O⁺</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `},
+
+            { type: 'header', content: 'Interactive: The Oxyanion Constructor' },
+            { type: 'paragraph', content: 'Many polyatomic ions contain Oxygen. These are called **Oxyanions**. There is a systematic way to name them based on the number of oxygen atoms. Use the tool below to explore the patterns.' },
+            
+            { type: 'simulation', simulationId: 'oxyanion-builder' },
+
+            { type: 'header', content: 'Decoding the Naming System' },
+            { type: 'paragraph', content: 'The ending of the name tells you about the oxygen content relative to the "standard" ion.' },
+            
+            { type: 'list', items: [
+                '**-ate:** The standard, most common form (e.g., Chlorate, Nitrate, Sulfate).',
+                '**-ite:** Has **one less oxygen** than the "-ate" form. The charge stays the same.',
+                '**hypo-...-ite:** Has **two less oxygens**.',
+                '**per-...-ate:** Has **one extra oxygen**.'
+            ]},
+
+            { type: 'exam-hint', content: '**Top Tip:** If you memorize the "-ate" form (e.g. Sulfate SO₄²⁻), you can figure out the others. Sulfite must be SO₃²⁻.' },
+
+            { type: 'header', content: 'Advanced Checkpoint: Master the List' },
+
+            { type: 'checkpoint', checkpoint: {
+                question: 'What is the formula for the Permanganate ion?',
+                options: ['MnO₂⁻', 'MnO₄⁻', 'MgO₄⁻', 'PMg⁻'],
+                correctIndex: 1,
+                explanation: 'Permanganate is MnO₄ with a -1 charge. It is a strong oxidizing agent often used in titrations (purple color).'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'The Dichromate ion (Cr₂O₇) has what charge?',
+                options: ['-1', '-2', '-3', '+2'],
+                correctIndex: 1,
+                explanation: 'Dichromate is Cr₂O₇²⁻. It is orange in color.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'Which ion has the formula C₂H₃O₂⁻?',
+                options: ['Carbonate', 'Oxalate', 'Acetate', 'Cyanide'],
+                correctIndex: 2,
+                explanation: 'Acetate (found in vinegar) is C₂H₃O₂⁻ (sometimes written CH₃COO⁻).'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'What is the correct formula for Sodium Hypochlorite (Bleach)?',
+                options: ['NaClO', 'NaClO₂', 'NaClO₃', 'NaClO₄'],
+                correctIndex: 0,
+                explanation: 'Chlorate is ClO₃⁻. Hypochlorite has 2 less oxygens: ClO⁻. So Sodium Hypochlorite is NaClO.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: 'What is the charge of the Phosphate ion?',
+                acceptedAnswers: ['-3', '3-', '3'],
+                explanation: 'Phosphate is PO₄³⁻. It is in the yellow "-3" group.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'Which of these is the only common positive polyatomic ion?',
+                options: ['Nitrate', 'Ammonium', 'Sulfate', 'Hydroxide'],
+                correctIndex: 1,
+                explanation: 'Ammonium (NH₄⁺) is positive. Most other polyatomics are negative anions.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'Bromate is BrO₃⁻. What is the formula for Perbromate?',
+                options: ['BrO₄⁻', 'BrO₂⁻', 'BrO⁻', 'Br⁻'],
+                correctIndex: 0,
+                explanation: '"Per...ate" means one extra oxygen than the standard "-ate". 3 + 1 = 4.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'What is the formula for the Cyanide ion?',
+                options: ['Cy⁻', 'CN⁻', 'CNO⁻', 'SCN⁻'],
+                correctIndex: 1,
+                explanation: 'Cyanide consists of Carbon and Nitrogen: CN⁻.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'What distinguishes Sulfite from Sulfate?',
+                options: ['Charge', 'Number of Sulfurs', 'Number of Oxygens', 'State of matter'],
+                correctIndex: 2,
+                explanation: 'Sulfate is SO₄²⁻. Sulfite is SO₃²⁻. The charge (-2) is the same, but Sulfite has one less oxygen.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: 'What is the formula for Hydrogen Carbonate (Bicarbonate)?',
+                acceptedAnswers: ['HCO3-', 'HCO3'],
+                explanation: 'It is Carbonate (CO₃²⁻) with a Hydrogen ion (H⁺) added, reducing the charge to -1. HCO₃⁻.'
+            }}
+          ]
+        },
+        {
+          id: '5.3-formulae',
+          title: '5.3: Writing Formulae',
+          blocks: [
+            { 
+                type: 'learning-objectives', 
+                items: ['5.3 write formulae for compounds formed between the ions listed above']
+            },
+            { type: 'paragraph', content: 'Ionic compounds are neutral overall. The total positive charge must equal the total negative charge.' },
+            { type: 'header', content: 'Drop and Swap Method' },
+            { type: 'list', items: [
+                '1. Write the symbols and charges: Al³⁺  O²⁻',
+                '2. Cross the numbers down: Al goes with 2, O goes with 3.',
+                '3. Formula: **Al₂O₃**',
+                '4. Check: (2 × +3) + (3 × -2) = +6 - 6 = 0.'
+            ]},
+            { type: 'simulation', simulationId: 'ionic-master' },
+            { type: 'checkpoint', checkpoint: {
+                question: 'What is the correct formula for Ammonium Sulfate?',
+                options: ['NH₄SO₄', '(NH₄)₂SO₄', 'NH₄(SO₄)₂', 'AmSO₄'],
+                correctIndex: 1,
+                explanation: 'Ammonium is NH₄⁺ (+1). Sulfate is SO₄²⁻ (-2). You need two ammoniums to balance one sulfate.'
+            }}
+          ]
+        },
+        {
+          id: '5.3a-practice',
+          title: '5.3a: Advanced Ionic Practice',
+          blocks: [
+            { 
+                type: 'learning-objectives', 
+                items: ['Apply rules to name complex ionic compounds', 'Write formulae for compounds containing transition metals and polyatomic ions']
+            },
+            { type: 'paragraph', content: 'Practice makes perfect. Below are complex examples often found in exams involving variable valency (transition metals) and polyatomic groups. Type your answer carefully.' },
+            
+            { type: 'exam-hint', content: '**Examiner Tip:** When writing names, Roman Numerals are required for transition metals (e.g., Iron(II)). When writing formulas, brackets are needed if there is more than one polyatomic ion (e.g., Mg(NO₃)₂).' },
+
+            { type: 'header', content: 'Set 1: Naming Ionic Compounds (Standard)' },
+
+            // Questions 1-10
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '1. Name the compound: NaBr',
+                acceptedAnswers: ['Sodium Bromide'],
+                explanation: 'Sodium is Group 1 (no roman numeral). Bromine becomes Bromide.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '2. Name the compound: Sc(OH)₃',
+                acceptedAnswers: ['Scandium Hydroxide', 'Scandium(III) Hydroxide'],
+                explanation: 'Scandium is a transition metal, but often forms +3. Hydroxide is polyatomic.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '3. Name the compound: V₂(SO₄)₃',
+                acceptedAnswers: ['Vanadium(III) Sulfate', 'Vanadium Sulfate'],
+                explanation: 'Sulfate is -2. Total negative is -6. Two Vanadiums must be +6 total, so each is +3.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '4. Name the compound: NH₄F',
+                acceptedAnswers: ['Ammonium Fluoride'],
+                explanation: 'NH₄ is Ammonium. F is Fluoride.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '5. Name the compound: CaCO₃',
+                acceptedAnswers: ['Calcium Carbonate'],
+                explanation: 'Ca is Calcium. CO₃ is Carbonate.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '6. Name the compound: NiPO₄',
+                acceptedAnswers: ['Nickel(III) Phosphate', 'Nickel Phosphate'],
+                explanation: 'Phosphate is PO₄³⁻. Therefore Nickel must be Ni³⁺.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '7. Name the compound: Li₂SO₃',
+                acceptedAnswers: ['Lithium Sulfite'],
+                explanation: 'SO₃ is Sulfite (one less oxygen than Sulfate SO₄).'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '8. Name the compound: Zn₃P₂',
+                acceptedAnswers: ['Zinc Phosphide', 'Zinc(II) Phosphide'],
+                explanation: 'Zn is Zinc. P is Phosphide.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '9. Name the compound: Sr(C₂H₃O₂)₂',
+                acceptedAnswers: ['Strontium Acetate'],
+                explanation: 'Sr is Strontium. C₂H₃O₂ is the Acetate ion.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '10. Name the compound: Cu₂O',
+                acceptedAnswers: ['Copper(I) Oxide'],
+                explanation: 'Oxygen is -2. There are two Coppers, so each must be +1 to balance.'
+            }},
+
+            { type: 'header', content: 'Set 2: Advanced Naming (Transition Metals)' },
+            { type: 'exam-hint', content: '**Examiner Tip:** If the metal is in the transition block (middle), calculate the charge of the anion first to figure out the metal\'s charge. Exceptions: Silver is always Ag⁺, Zinc is always Zn²⁺ (no roman numerals needed).' },
+
+            // Questions 11-20
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '11. Name the compound: Ag₃PO₄',
+                acceptedAnswers: ['Silver Phosphate', 'Silver(I) Phosphate'],
+                explanation: 'Silver does not usually need a roman numeral (always +1).'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '12. Name the compound: YClO₃',
+                acceptedAnswers: ['Yttrium Chlorate', 'Yttrium(III) Chlorate'],
+                explanation: 'ClO₃ is Chlorate (-1).'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '13. Name the compound: SnS₂',
+                acceptedAnswers: ['Tin(IV) Sulfide'],
+                explanation: 'Sulfide is -2. Two sulfides = -4. Tin must be +4.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '14. Name the compound: Ti(CN)₄',
+                acceptedAnswers: ['Titanium(IV) Cyanide'],
+                explanation: 'Cyanide (CN) is -1. Four of them = -4. Titanium must be +4.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '15. Name the compound: KMnO₄',
+                acceptedAnswers: ['Potassium Permanganate'],
+                explanation: 'MnO₄ is Permanganate.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '16. Name the compound: Pb₃N₂',
+                acceptedAnswers: ['Lead(II) Nitride'],
+                explanation: 'Nitride is -3. Total neg = -6. Three Leads must equal +6, so each is +2.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '17. Name the compound: CoCO₃',
+                acceptedAnswers: ['Cobalt(II) Carbonate', 'Cobalt Carbonate'],
+                explanation: 'Carbonate is -2. Cobalt must be +2.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '18. Name the compound: CdSO₃',
+                acceptedAnswers: ['Cadmium Sulfite', 'Cadmium(II) Sulfite'],
+                explanation: 'SO₃ is Sulfite.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '19. Name the compound: Cu(NO₂)₂',
+                acceptedAnswers: ['Copper(II) Nitrite'],
+                explanation: 'NO₂ is Nitrite (-1). Two of them means Copper is +2.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '20. Name the compound: Fe(HCO₃)₂',
+                acceptedAnswers: ['Iron(II) Bicarbonate', 'Iron(II) Hydrogen Carbonate'],
+                explanation: 'HCO₃ is Bicarbonate (-1). Iron must be +2.'
+            }},
+
+            { type: 'header', content: 'Set 3: Writing Formulas (Multiple Choice)' },
+            { type: 'paragraph', content: 'Select the correct formula. Pay attention to subscripts and brackets.' },
+
+            // Questions 21-30
+            { type: 'checkpoint', checkpoint: {
+                question: '21. Lithium Acetate',
+                options: ['LiC₂H₃O₂', 'Li₂C₂H₃O₂', 'LiAc', 'Li(C₂H₃O₂)₂'],
+                correctIndex: 0,
+                explanation: 'Lithium is +1, Acetate is -1. 1:1 ratio.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: '22. Iron(II) Phosphate',
+                options: ['FePO₄', 'Fe₂(PO₄)₃', 'Fe₃(PO₄)₂', 'FeP'],
+                correctIndex: 2,
+                explanation: 'Fe²⁺ and PO₄³⁻. Swap charges: Fe₃(PO₄)₂.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: '23. Titanium(II) Selenide',
+                options: ['TiSe₂', 'Ti₂Se', 'TiSe', 'Ti(II)Se'],
+                correctIndex: 2,
+                explanation: 'Ti²⁺ and Se²⁻ (Group 6). Charges cancel 1:1.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: '24. Calcium Bromide',
+                options: ['CaBr', 'CaBr₂', 'Ca₂Br', 'Ca₂Br₂'],
+                correctIndex: 1,
+                explanation: 'Ca²⁺ and Br⁻. Needs two Bromides.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: '25. Gallium Chloride',
+                options: ['GaCl', 'GaCl₂', 'GaCl₃', 'Ga₃Cl'],
+                correctIndex: 2,
+                explanation: 'Gallium is Group 3 (+3). Chlorine is -1.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: '26. Sodium Hydride',
+                options: ['NaH', 'NaOH', 'Na₂H', 'NaH₂'],
+                correctIndex: 0,
+                explanation: 'Na⁺ and Hydride H⁻.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: '27. Beryllium Hydroxide',
+                options: ['BeOH', 'Be(OH)₂', 'BeOH₂', 'Be₂OH'],
+                correctIndex: 1,
+                explanation: 'Be²⁺ and OH⁻. Needs brackets for the polyatomic ion: Be(OH)₂.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: '28. Zinc Carbonate',
+                options: ['ZnCO₃', 'Zn(CO₃)₂', 'Zn₂CO₃', 'ZnC'],
+                correctIndex: 0,
+                explanation: 'Zn²⁺ and CO₃²⁻. Charges cancel 1:1.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: '29. Manganese(VII) Arsenide',
+                options: ['MnAs', 'Mn₇As', 'MnAs₇', 'Mn₃As₇'],
+                correctIndex: 3,
+                explanation: 'Manganese(VII) is Mn⁷⁺. Arsenide (Group 5) is As³⁻. Swap: Mn₃As₇.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: '30. Copper(II) Chlorate',
+                options: ['CuClO₃', 'Cu(ClO₃)₂', 'CuCl₂', 'Cu₂(ClO₃)'],
+                correctIndex: 1,
+                explanation: 'Cu²⁺ and Chlorate ClO₃⁻. Needs two chlorates.'
+            }},
+
+            { type: 'header', content: 'Set 4: Advanced Formulas (Text Input)' },
+            { type: 'exam-hint', content: '**Examiner Tip:** For formulas, you can type standard numbers (e.g. H2O). The system ignores case.' },
+
+            // Questions 31-40
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '31. Formula for Cobalt(III) Chromate',
+                acceptedAnswers: ['Co2(CrO4)3', 'Co2(CrO4)3'],
+                explanation: 'Co³⁺ and Chromate CrO₄²⁻. Swap: Co₂(CrO₄)₃.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '32. Formula for Ammonium Oxide',
+                acceptedAnswers: ['(NH4)2O', '(NH4)2O'],
+                explanation: 'Ammonium NH₄⁺ and Oxide O²⁻. (NH₄)₂O.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '33. Formula for Potassium Hydroxide',
+                acceptedAnswers: ['KOH'],
+                explanation: 'K⁺ and OH⁻. KOH.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '34. Formula for Lead(IV) Sulfate',
+                acceptedAnswers: ['Pb(SO4)2'],
+                explanation: 'Pb⁴⁺ and SO₄²⁻. Ratio is 2:4 which simplifies to 1:2. Pb(SO₄)₂.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '35. Formula for Silver Cyanide',
+                acceptedAnswers: ['AgCN'],
+                explanation: 'Ag⁺ and CN⁻.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '36. Formula for Vanadium(V) Nitride',
+                acceptedAnswers: ['V3N5'],
+                explanation: 'V⁵⁺ and N³⁻. Swap: V₃N₅.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '37. Formula for Strontium Acetate',
+                acceptedAnswers: ['Sr(C2H3O2)2'],
+                explanation: 'Sr²⁺ and Acetate C₂H₃O₂⁻.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '38. Formula for Molybdenum(VI) Sulfate',
+                acceptedAnswers: ['Mo(SO4)3'],
+                explanation: 'Mo⁶⁺ and SO₄²⁻. 2:6 ratio simplifies to 1:3. Mo(SO₄)₃.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '39. Formula for Platinum(II) Sulfide',
+                acceptedAnswers: ['PtS'],
+                explanation: 'Pt²⁺ and S²⁻. Cancel 1:1.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '40. Formula for Ammonium Sulfate',
+                acceptedAnswers: ['(NH4)2SO4'],
+                explanation: 'NH₄⁺ and SO₄²⁻. Need two ammoniums.'
+            }},
+
+            { type: 'header', content: 'Set 5: Final Mix (Fill in the Blank)' },
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '41. Formula for Chromium(VI) Phosphate',
+                acceptedAnswers: ['Cr(PO4)2', 'Cr(PO₄)₂'],
+                explanation: 'Cr⁶⁺ and PO₄³⁻. Ratio 3:6 simplifies to 1:2.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '42. Formula for Vanadium(IV) Carbonate',
+                acceptedAnswers: ['V(CO3)2', 'V(CO₃)₂'],
+                explanation: 'V⁴⁺ and CO₃²⁻. Ratio 2:4 simplifies to 1:2.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '43. Formula for Tin(II) Nitrite',
+                acceptedAnswers: ['Sn(NO2)2', 'Sn(NO₂)₂'],
+                explanation: 'Sn²⁺ and NO₂⁻. Need two nitrites.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '44. Formula for Cobalt(III) Oxide',
+                acceptedAnswers: ['Co2O3', 'Co₂O₃'],
+                explanation: 'Co³⁺ and O²⁻. Swap: Co₂O₃.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '45. Formula for Titanium(II) Acetate',
+                acceptedAnswers: ['Ti(C2H3O2)2', 'Ti(C₂H₃O₂)₂'],
+                explanation: 'Ti²⁺ and Acetate⁻.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '46. Formula for Vanadium(V) Sulfide',
+                acceptedAnswers: ['V2S5', 'V₂S₅'],
+                explanation: 'V⁵⁺ and S²⁻. Swap.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '47. Formula for Chromium(III) Hydroxide',
+                acceptedAnswers: ['Cr(OH)3', 'Cr(OH)₃'],
+                explanation: 'Cr³⁺ and OH⁻.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '48. Formula for Lithium Iodide',
+                acceptedAnswers: ['LiI'],
+                explanation: 'Li⁺ and I⁻.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '49. Formula for Lead(II) Nitride',
+                acceptedAnswers: ['Pb3N2', 'Pb₃N₂'],
+                explanation: 'Pb²⁺ and N³⁻. Swap.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: '50. Formula for Silver Bromide',
+                acceptedAnswers: ['AgBr'],
+                explanation: 'Ag⁺ and Br⁻.'
+            }}
+          ]
+        },
+        {
           id: '5.4-dot-cross-ionic',
           title: '5.4: Dot-and-Cross Diagrams',
           blocks: [
             { 
                 type: 'learning-objectives', 
-                items: ['5.4 draw dot-and-cross diagrams to show the formation of ionic compounds by electron transfer, limited to combinations of elements from Groups 1, 2, 3 and 5, 6, 7']
+                items: [
+                    '5.4 draw dot-and-cross diagrams to show the formation of ionic compounds by electron transfer',
+                    'Understand how to represent compounds with different ratios (e.g. 1:2, 2:1)',
+                    'Predict the formula of an ionic compound based on group numbers'
+                ]
             },
-            { type: 'key-vocab', vocabItems: [
-                { term: 'Dot-and-Cross', definition: 'A diagram that shows the transfer of electrons from metal atoms (dots) to non-metal atoms (crosses).' },
-                { term: 'Ratio', definition: 'The proportion of ions needed to balance charges (e.g., 1:2 in MgCl₂).' },
-                { term: 'Valence Electron', definition: 'An electron in the outermost shell of an atom.' }
-            ]},
-            { type: 'header', content: 'Why do we need diagrams?' },
-            { type: 'paragraph', content: 'Chemical formulas like NaCl or MgCl₂ tell us the ratio of atoms, but they don\'t show **how** the bond formed. Dot-and-cross diagrams visualize the movement of electrons to create stable ions.' },
             
-            { type: 'simulation', simulationId: 'ionic-bonding' },
-
-            { type: 'header', content: 'Scenario 1: The 1:1 Ratio (NaCl)' },
-            { type: 'list', items: [
-                '**Metal:** Sodium (2.8.1) wants to lose 1 electron.',
-                '**Non-Metal:** Chlorine (2.8.7) wants to gain 1 electron.',
-                '**Result:** Perfect match! One Na gives to one Cl.',
-                '**Formula:** NaCl'
+            // VOCABULARY
+            { type: 'key-vocab', vocabItems: [
+                { term: 'Dot-and-Cross Diagram', definition: 'A drawing that tracks the movement of electrons from a metal to a non-metal.' },
+                { term: 'Valence Shell', definition: 'The outermost electron shell, which determines chemical reactivity.' },
+                { term: 'Electron Transfer', definition: 'The movement of electrons from one atom to another (Ionic bonding).' },
+                { term: 'Empirical Formula', definition: 'The simplest whole number ratio of ions in the compound.' }
             ]},
 
-            { type: 'header', content: 'Scenario 2: The 1:2 Ratio (MgCl₂)' },
-            { type: 'paragraph', content: 'Sometimes a single non-metal atom cannot accept all the electrons a metal needs to lose.' },
+            // SECTION 1: 1:1 RATIO
+            { type: 'header', content: '1. Simple 1:1 Transfer (Group 1 + Group 7)' },
+            { type: 'paragraph', content: 'The simplest ionic bond is when one metal atom gives one electron to one non-metal atom. Example: **Sodium Chloride (NaCl)**.' },
             { type: 'list', items: [
-                '**Metal:** Magnesium (2.8.2) needs to lose **2 electrons**.',
-                '**Non-Metal:** Chlorine (2.8.7) can only accept **1 electron**.',
-                '**Solution:** Magnesium gives one electron to the first Chlorine, and the second electron to a **second** Chlorine.',
-                '**Ratio:** 1 Magnesium : 2 Chlorines.',
-                '**Formula:** MgCl₂'
+                'Sodium (2.8.1) has 1 excess electron.',
+                'Chlorine (2.8.7) needs 1 electron.',
+                'Transfer: Na gives 1e⁻ to Cl.',
+                'Result: Na⁺ (2.8) and Cl⁻ (2.8.8).'
+            ]},
+            
+            // SIMULATION 1:1
+            { type: 'header', content: 'Interactive: Electron Transfer' },
+            { type: 'simulation', simulationId: 'ion-formation' },
+
+            // SECTION 2: 1:2 RATIO
+            { type: 'header', content: '2. The 1:2 Ratio (Group 2 + Group 7)' },
+            { type: 'paragraph', content: 'What if the metal needs to lose 2 electrons, but the non-metal only needs 1? Example: **Magnesium Chloride (MgCl₂)**.' },
+            { type: 'list', items: [
+                'Magnesium (2.8.2) must lose **2 electrons** to be stable.',
+                'Chlorine (2.8.7) can only accept **1 electron**.',
+                'Solution: Magnesium needs **TWO** Chlorine atoms.',
+                'One Mg gives one electron to the first Cl, and the second electron to the second Cl.'
+            ]},
+            { type: 'exam-hint', content: 'In your diagram, draw ONE Magnesium atom in the middle and TWO Chlorine atoms on the sides. Show arrows going to both.' },
+
+            // SECTION 3: 2:1 RATIO
+            { type: 'header', content: '3. The 2:1 Ratio (Group 1 + Group 6)' },
+            { type: 'paragraph', content: 'Sometimes you need two metal atoms to satisfy one non-metal. Example: **Sodium Oxide (Na₂O)**.' },
+            { type: 'list', items: [
+                'Oxygen (2.6) needs **2 electrons**.',
+                'Sodium (2.8.1) can only give **1 electron**.',
+                'Solution: **TWO** Sodium atoms each give one electron to the Oxygen atom.'
             ]},
 
-            { type: 'header', content: 'Scenario 3: The 2:1 Ratio (Na₂O)' },
-            { type: 'paragraph', content: 'Sometimes the non-metal needs more electrons than a single metal atom can provide.' },
-            { type: 'list', items: [
-                '**Non-Metal:** Oxygen (2.6) needs to gain **2 electrons**.',
-                '**Metal:** Sodium (2.8.1) can only give **1 electron**.',
-                '**Solution:** Two Sodium atoms are needed. Each gives one electron to the same Oxygen atom.',
-                '**Ratio:** 2 Sodiums : 1 Oxygen.',
-                '**Formula:** Na₂O'
-            ]},
+            // MAIN SIMULATION FOR RATIOS
+            { type: 'header', content: 'Interactive Lab: Building Different Ratios' },
+            { type: 'paragraph', content: 'Use the main simulation lab to build compounds with different ratios. Try to make **Magnesium Fluoride (MgF₂)** and **Lithium Oxide (Li₂O)**.' },
+            { type: 'simulation', simulationId: 'ionic-master' },
 
+            // QUESTIONS
+            { type: 'header', content: 'Knowledge Checkpoint' },
+            
+            // Q1
             { type: 'checkpoint', checkpoint: {
-                question: 'In Magnesium Chloride, why do we need two Chlorine atoms?',
-                options: [
-                    'Magnesium has 2 electrons to lose, but Chlorine can only take 1',
-                    'Chlorine is a gas',
-                    'Magnesium is larger than Chlorine',
-                    'To make the mass equal'
-                ],
+                question: 'In a dot-and-cross diagram, why are dots and crosses used?',
+                options: ['To look pretty', 'To distinguish electrons from the metal vs the non-metal', 'To show protons vs electrons', 'To show positive vs negative charge'],
+                correctIndex: 1,
+                explanation: 'Using different symbols helps track the origin of the electrons, showing clearly which ones were transferred.'
+            }},
+            
+            // Q2
+            { type: 'checkpoint', checkpoint: {
+                question: 'Magnesium (Group 2) reacts with Oxygen (Group 6). What is the ratio?',
+                options: ['1:1 (MgO)', '1:2 (MgO₂)', '2:1 (Mg₂O)', '2:3 (Mg₂O₃)'],
                 correctIndex: 0,
-                explanation: 'Magnesium (Group 2) loses 2e-. Chlorine (Group 7) only needs 1e-. Therefore, two chlorines are required to accept both electrons.'
+                explanation: 'Mg loses 2e⁻. O gains 2e⁻. They balance perfectly 1:1.'
             }},
+
+            // Q3
             { type: 'checkpoint', checkpoint: {
-                question: 'What is the ratio of ions in Aluminum Oxide (Al₂O₃)?',
-                options: ['1:1', '1:2', '2:3', '3:2'],
-                correctIndex: 2,
-                explanation: 'Aluminum loses 3e-. Oxygen gains 2e-. The lowest common multiple of 2 and 3 is 6. So we need 2 Al (2x3=6) and 3 O (3x2=6).'
+                question: 'How many Chlorine atoms are needed to react with one Calcium atom?',
+                options: ['1', '2', '3', '4'],
+                correctIndex: 1,
+                explanation: 'Calcium (Ca) is Group 2 -> Ca²⁺. Chlorine (Cl) is Group 7 -> Cl⁻. You need two Cl⁻ to balance one Ca²⁺.'
             }},
-            { type: 'exam-hint', content: 'When drawing these diagrams in an exam: 1. Draw outer shells only. 2. Use different symbols (dots vs crosses) for different elements. 3. Show the charge on the final ions clearly.' }
+
+            // Q4
+            { type: 'checkpoint', checkpoint: {
+                question: 'What is the electronic configuration of the Chloride ion in MgCl₂?',
+                options: ['2.8.7', '2.8.8', '2.8', '2.8.1'],
+                correctIndex: 1,
+                explanation: 'Chlorine atom is 2.8.7. It gains 1 electron to become stable 2.8.8.'
+            }},
+
+            // Q5
+            { type: 'checkpoint', checkpoint: {
+                question: 'Which statement about the formation of Sodium Oxide (Na₂O) is correct?',
+                options: [
+                    'One Na gives 2 electrons to O',
+                    'Two Na atoms each give 1 electron to O',
+                    'O gives electrons to Na',
+                    'They share electrons'
+                ],
+                correctIndex: 1,
+                explanation: 'Sodium is Group 1 (can only lose 1). Oxygen needs 2. So you need two Sodium atoms.'
+            }},
+
+            // Q6
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: 'What is the formula for Aluminum Fluoride?',
+                acceptedAnswers: ['AlF3'],
+                explanation: 'Aluminum is Al³⁺. Fluorine is F⁻. You need three fluorides: AlF₃.'
+            }},
+
+            // Q7
+            { type: 'checkpoint', checkpoint: {
+                question: 'Which diagram would represent Calcium Oxide?',
+                options: [
+                    '[Ca]⁺ [O]⁻',
+                    '[Ca]²⁺ [O]²⁻',
+                    '[Ca]²⁺ 2[O]⁻',
+                    '[Ca]⁺ [O]²⁻'
+                ],
+                correctIndex: 1,
+                explanation: 'Ca is Group 2 (+2). O is Group 6 (-2). 1:1 ratio with double charges.'
+            }},
+
+            // Q8
+            { type: 'checkpoint', checkpoint: {
+                question: 'Why do we put the final ions in square brackets?',
+                options: [
+                    'It is just a style choice',
+                    'To indicate the charge belongs to the whole ion structure',
+                    'To trap the electrons',
+                    'To show they are solid'
+                ],
+                correctIndex: 1,
+                explanation: 'Square brackets with the charge outside show that the ion acts as a single charged unit.'
+            }},
+
+            // Q9
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: 'Determine the formula for Lithium Nitride (Li is Grp 1, N is Grp 5).',
+                acceptedAnswers: ['Li3N'],
+                explanation: 'N needs 3 electrons (to go from 5 to 8). Li can give 1. You need 3 Li atoms. Li₃N.'
+            }},
+
+            // Q10
+            { type: 'checkpoint', checkpoint: {
+                question: 'What is the charge on the Anion in Aluminum Oxide (Al₂O₃)?',
+                options: ['-1', '-2', '-3', '+3'],
+                correctIndex: 1,
+                explanation: 'The anion is Oxygen (Oxide). Group 6 always forms -2 ions.'
+            }}
           ]
         },
         {
@@ -463,7 +1186,6 @@ export const IGCSE_UNIT_5: Unit = {
         }
       ]
     },
-    // ... Rest of the unit remains unchanged ...
     {
       id: 'topic-5g',
       title: '5(g) Covalent Bonding',
@@ -479,7 +1201,6 @@ export const IGCSE_UNIT_5: Unit = {
             { type: 'paragraph', content: 'Covalent bonding occurs between **non-metal** atoms. They share pairs of electrons to achieve a full outer shell.' }
           ]
         },
-        // ... (truncated for brevity, ensuring rest of file structure is maintained if I were outputting the whole file, but I will just output the changed part or the whole file if easier)
         {
           id: '5.9-covalent-electrostatic',
           title: '5.9: Electrostatic Attraction',

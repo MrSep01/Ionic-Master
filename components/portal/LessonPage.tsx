@@ -1,7 +1,6 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Lesson } from '../../portal/types';
-import { LessonProgressData } from '../../types';
 import { Lightbulb, HelpCircle, Book, FlaskConical, Check, X, AlertCircle, ClipboardList, CheckCircle2, ArrowRight, ArrowLeft, PenTool } from 'lucide-react';
 import ParticleStateSim from './simulations/ParticleStateSim';
 import HeatingCurveSim from './simulations/HeatingCurveSim';
@@ -18,12 +17,9 @@ import FiltrationSim from './simulations/FiltrationSim';
 import ChromatographySim from './simulations/ChromatographySim';
 import IonFormationSim from './simulations/IonFormationSim';
 import OxyanionBuilderSim from './simulations/OxyanionBuilderSim';
-import IonicBondingSim from './simulations/IonicBondingSim';
 
 interface LessonPageProps {
   lesson: Lesson;
-  initialData?: LessonProgressData;
-  onSave: (data: LessonProgressData) => void;
   onLaunchSimulation: () => void;
   onComplete: (lessonId: string) => void;
   onNext?: () => void;
@@ -37,44 +33,33 @@ const normalizeAnswer = (str: string) => {
     return str.replace(/\s+/g, '').toLowerCase().trim();
 };
 
-const LessonPage: React.FC<LessonPageProps> = ({ lesson, initialData, onSave, onLaunchSimulation, onComplete, onNext, onPrev }) => {
-  const [selections, setSelections] = useState<Record<number, number>>(initialData?.selections || {});
-  const [textAnswers, setTextAnswers] = useState<Record<number, string>>(initialData?.textAnswers || {});
+const LessonPage: React.FC<LessonPageProps> = ({ lesson, onLaunchSimulation, onComplete, onNext, onPrev }) => {
+  const [selections, setSelections] = useState<Record<number, number>>({});
+  const [textAnswers, setTextAnswers] = useState<Record<number, string>>({});
   const [isCompleted, setIsCompleted] = useState(false);
   const [showError, setShowError] = useState(false);
   
   // Tracks validation status per question: undefined (not checked), true (correct), false (incorrect)
-  const [validatedInputs, setValidatedInputs] = useState<Record<number, boolean>>(initialData?.validatedInputs || {});
+  const [validatedInputs, setValidatedInputs] = useState<Record<number, boolean>>({});
 
-  // Update state ONLY when lesson changes (navigation)
-  // We do NOT include initialData in dependency array to avoid re-syncing loop when parent updates
+  // Reset state when lesson changes
   useEffect(() => {
-      setSelections(initialData?.selections || {});
-      setTextAnswers(initialData?.textAnswers || {});
-      setValidatedInputs(initialData?.validatedInputs || {});
+      setSelections({});
+      setTextAnswers({});
+      setValidatedInputs({});
       setIsCompleted(false);
       setShowError(false);
   }, [lesson.id]);
 
-  // Auto-save whenever progress state changes
-  useEffect(() => {
-      onSave({
-          selections,
-          textAnswers,
-          validatedInputs
-      });
-  }, [selections, textAnswers, validatedInputs, onSave]);
-
   const handleSelect = (blockIdx: number, optionIdx: number) => {
     setSelections(prev => ({ ...prev, [blockIdx]: optionIdx }));
     
-    // Immediate Validation Logic for Multiple Choice
+    // Immediate Validation for Multiple Choice
     const block = lesson.blocks[blockIdx];
-    if (block.checkpoint && block.checkpoint.correctIndex !== undefined) {
+    if (block.checkpoint && block.checkpoint.variant !== 'text-input') {
         const isCorrect = optionIdx === block.checkpoint.correctIndex;
         setValidatedInputs(prev => ({ ...prev, [blockIdx]: isCorrect }));
     }
-
     setShowError(false);
   };
 
@@ -82,16 +67,14 @@ const LessonPage: React.FC<LessonPageProps> = ({ lesson, initialData, onSave, on
       setTextAnswers(prev => ({ ...prev, [blockIdx]: val }));
       // If user types after an error, reset validation state to allow retry immediately
       if (validatedInputs[blockIdx] === false) {
-          setValidatedInputs(prev => {
-              const next = { ...prev };
-              delete next[blockIdx];
-              return next;
-          });
+          const newValidated = { ...validatedInputs };
+          delete newValidated[blockIdx]; // Remove "false" status so it looks active again
+          setValidatedInputs(newValidated);
       }
       setShowError(false);
   };
 
-  // CHECK ONE BY ONE (For Text Inputs)
+  // CHECK ONE BY ONE (For Text Inputs mostly)
   const handleCheckSingle = (blockIdx: number) => {
       const block = lesson.blocks[blockIdx];
       if (!block.checkpoint) return;
@@ -102,7 +85,7 @@ const LessonPage: React.FC<LessonPageProps> = ({ lesson, initialData, onSave, on
           const accepted = block.checkpoint.acceptedAnswers?.map(normalizeAnswer) || [];
           isCorrect = accepted.includes(userAns);
       } else {
-          // Fallback for MC if not using immediate validation
+          // Fallback for MC if needed manually (though handleSelect does it now)
           isCorrect = selections[blockIdx] === block.checkpoint.correctIndex;
       }
 
@@ -123,21 +106,23 @@ const LessonPage: React.FC<LessonPageProps> = ({ lesson, initialData, onSave, on
 
           checkpoints.forEach(item => {
               let isCorrect = false;
-              // Check if already validated and correct
+              // Check existing validation state first (for MC mostly)
               if (newValidatedInputs[item.idx] === true) {
                   isCorrect = true;
-              } else {
-                  // Re-validate if needed (e.g. text inputs not checked yet)
-                  if (item.block.checkpoint?.variant === 'text-input') {
-                      const userAns = normalizeAnswer(textAnswers[item.idx] || '');
-                      const accepted = item.block.checkpoint.acceptedAnswers?.map(normalizeAnswer) || [];
-                      isCorrect = accepted.includes(userAns);
-                  } else {
-                      if (selections[item.idx] === item.block.checkpoint?.correctIndex) {
-                          isCorrect = true;
-                      }
-                  }
+              } else if (item.block.checkpoint?.variant === 'text-input') {
+                  const userAns = normalizeAnswer(textAnswers[item.idx] || '');
+                  const accepted = item.block.checkpoint.acceptedAnswers?.map(normalizeAnswer) || [];
+                  isCorrect = accepted.includes(userAns);
                   newValidatedInputs[item.idx] = isCorrect;
+              } else {
+                  // Multiple Choice fallback check
+                  if (selections[item.idx] === item.block.checkpoint?.correctIndex) {
+                      isCorrect = true;
+                      newValidatedInputs[item.idx] = true;
+                  } else {
+                      // Mark as incorrect if checked and wrong
+                      newValidatedInputs[item.idx] = false;
+                  }
               }
               
               if (isCorrect) correctCount++;
@@ -160,7 +145,7 @@ const LessonPage: React.FC<LessonPageProps> = ({ lesson, initialData, onSave, on
   };
 
   return (
-    <div className="w-full max-w-none mx-auto pb-20">
+    <div className="w-full max-w-none mx-auto pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="mb-8 border-b border-slate-200 pb-6 flex justify-between items-start gap-4 max-w-7xl mx-auto">
           <div>
             <h1 className="text-3xl md:text-5xl font-black text-slate-900 mb-2 leading-tight">
@@ -309,11 +294,9 @@ const LessonPage: React.FC<LessonPageProps> = ({ lesson, initialData, onSave, on
               
               const validationState = validatedInputs[idx];
               const hasAnswered = validationState !== undefined;
+              // For MC: validationState true = Correct, false = Incorrect.
+              // For Text: validationState true = Correct, false = Incorrect.
               const isCorrect = validationState === true;
-              const isIncorrect = validationState === false;
-
-              // Only permanently lock if correct
-              const isQuestionSolved = isCorrect; 
 
               return (
                 <div key={idx} className="my-10 bg-white border-2 border-slate-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow max-w-5xl mx-auto">
@@ -366,42 +349,46 @@ const LessonPage: React.FC<LessonPageProps> = ({ lesson, initialData, onSave, on
                                {block.checkpoint?.options?.map((option, i) => {
                                    const selected = selections[idx];
                                    const isSelected = selected === i;
-                                   const isThisCorrectOption = i === block.checkpoint?.correctIndex;
+                                   
+                                   // Logic: 
+                                   // If question is CORRECT (validationState === true), lock everything.
+                                   // If question is INCORRECT (validationState === false), keep enabled so user can switch.
+                                   
+                                   const isLocked = validationState === true; 
                                    
                                    let btnClass = "border-slate-200 bg-white hover:border-indigo-300 hover:shadow-sm text-slate-700";
                                    
-                                   if (hasAnswered) {
-                                       // If question is solved (correct answer found), show green for correct
-                                       if (isQuestionSolved && isThisCorrectOption) {
-                                           btnClass = "bg-emerald-50 border-emerald-500 text-emerald-800 ring-1 ring-emerald-500 shadow-md opacity-100";
-                                       } 
-                                       // If this specific option was selected and it is wrong
-                                       else if (isSelected && !isThisCorrectOption) {
-                                           btnClass = "bg-rose-50 border-rose-300 text-rose-800 opacity-100 shadow-inner";
+                                   if (isSelected) {
+                                       if (validationState === true) {
+                                           // Correct Selection
+                                           btnClass = "bg-emerald-50 border-emerald-500 text-emerald-800 ring-1 ring-emerald-500 shadow-md";
+                                       } else if (validationState === false) {
+                                           // Incorrect Selection
+                                           btnClass = "bg-rose-50 border-rose-300 text-rose-800 opacity-100";
+                                       } else {
+                                           // Just selected (shouldn't happen with immediate val)
+                                           btnClass = "border-indigo-500 bg-indigo-50 text-indigo-900 ring-2 ring-indigo-200";
                                        }
-                                       // If question is solved, fade out other options
-                                       else if (isQuestionSolved) {
-                                           btnClass = "border-slate-100 text-slate-300 opacity-40 bg-slate-50";
+                                   } else {
+                                       if (isLocked) {
+                                           // Correct answer found, dim others
+                                           btnClass = "border-slate-100 text-slate-400 opacity-50 bg-slate-50 cursor-not-allowed";
+                                       } else {
+                                           // Normal state
+                                           btnClass = "border-slate-200 bg-white hover:border-indigo-300 text-slate-700";
                                        }
-                                   } 
-                                   
-                                   // Keep selected state highlight if not yet answered/validated
-                                   if (isSelected && !hasAnswered) {
-                                       btnClass = "border-indigo-500 bg-indigo-50 text-indigo-900 ring-2 ring-indigo-200";
                                    }
 
                                    return (
                                        <button
                                             key={i}
-                                            onClick={() => !isQuestionSolved && handleSelect(idx, i)}
-                                            disabled={isQuestionSolved} // Only disable if correctly solved
+                                            onClick={() => !isLocked && handleSelect(idx, i)} // Lock only if correct
+                                            disabled={isLocked} 
                                             className={`text-left px-5 py-4 rounded-xl border-2 font-bold transition-all flex items-center justify-between ${btnClass}`}
                                        >
                                            <span dangerouslySetInnerHTML={{ __html: option }} />
-                                           
-                                           {/* Icons */}
-                                           {isQuestionSolved && isThisCorrectOption && <Check className="w-5 h-5 text-emerald-600" />}
-                                           {hasAnswered && isSelected && !isThisCorrectOption && <X className="w-5 h-5 text-rose-600" />}
+                                           {isSelected && validationState === true && <Check className="w-5 h-5 text-emerald-600" />}
+                                           {isSelected && validationState === false && <X className="w-5 h-5 text-rose-600" />}
                                        </button>
                                    )
                                })}
@@ -410,17 +397,18 @@ const LessonPage: React.FC<LessonPageProps> = ({ lesson, initialData, onSave, on
 
                        {/* Feedback Area */}
                        {hasAnswered && (
-                           <div className={`mt-6 p-5 rounded-xl border-l-4 shadow-sm ${
-                               isCorrect 
-                               ? 'bg-emerald-50 border-emerald-500 text-emerald-900' 
-                               : 'bg-rose-50 border-rose-500 text-rose-900'
-                           }`}>
+                           <div className={`mt-6 p-5 rounded-xl border-l-4 ${isCorrect ? 'bg-emerald-50 border-emerald-500 text-emerald-900' : 'bg-rose-50 border-rose-500 text-rose-900'} animate-in fade-in slide-in-from-top-2 shadow-sm`}>
                                <strong className="block text-xs font-black uppercase tracking-widest mb-2 flex items-center gap-2">
-                                   {isCorrect ? <><CheckCircle2 className="w-4 h-4" /> Correct Answer</> : <><AlertCircle className="w-4 h-4" /> Incorrect - Try Again</>}
+                                   {isCorrect ? <><CheckCircle2 className="w-4 h-4" /> Correct Answer</> : <><AlertCircle className="w-4 h-4" /> Incorrect</>}
                                </strong>
                                
+                               {/* Only show explanation if CORRECT or if it's a Text Input (since text input doesn't have multiple options to try) */}
                                {(isCorrect || isTextInput) && (
                                    <p className="text-base leading-relaxed font-medium mb-3">{block.checkpoint?.explanation}</p>
+                               )}
+                               
+                               {!isCorrect && !isTextInput && (
+                                   <p className="text-sm font-bold opacity-80">Try again! Select another option.</p>
                                )}
                                
                                {/* ALWAYS SHOW THE ACCEPTED ANSWER FOR TEXT INPUTS, EVEN IF CORRECT */}
@@ -460,7 +448,6 @@ const LessonPage: React.FC<LessonPageProps> = ({ lesson, initialData, onSave, on
               if (block.simulationId === 'chromatography-rf') return <SimWrapper key={idx}><ChromatographySim mode="RF" /></SimWrapper>;
               if (block.simulationId === 'ion-formation') return <SimWrapper key={idx}><IonFormationSim /></SimWrapper>;
               if (block.simulationId === 'oxyanion-builder') return <SimWrapper key={idx}><OxyanionBuilderSim /></SimWrapper>;
-              if (block.simulationId === 'ionic-bonding') return <SimWrapper key={idx}><IonicBondingSim /></SimWrapper>;
 
               // Default / IonicMaster simulation launcher
               return (
@@ -514,7 +501,7 @@ const LessonPage: React.FC<LessonPageProps> = ({ lesson, initialData, onSave, on
                             : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-200'}
                     `}
                 >
-                    {isCompleted ? 'Next Lesson' : 'Check All Answers'} <ArrowRight className="w-5 h-5" />
+                    {isCompleted ? 'Next Lesson' : 'Check All / Finish'} <ArrowRight className="w-5 h-5" />
                 </button>
             </div>
         </div>

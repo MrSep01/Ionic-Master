@@ -56,13 +56,46 @@ const IonFormationSim: React.FC = () => {
 
   const data = getData(scenario);
 
+  // --- HELPER: ELECTRON POSITIONING (PAIRED) ---
+  // Calculates (x,y) for an electron to simulate "paired" filling (Top, Right, Bottom, Left)
+  const getElectronPos = (n: number, total: number, r: number, shellIdx: number, cx: number, cy: number) => {
+    let angle = 0;
+    
+    if (shellIdx === 0) {
+        // Inner shell (max 2): Pair at top if 2, or single at top
+        const base = -Math.PI / 2;
+        if (total === 1) angle = base;
+        else {
+            const offset = 0.35;
+            angle = base + (n === 0 ? -offset : offset);
+        }
+    } else {
+        // Outer shells (max 8): Fill order 0:Top, 1:Right, 2:Bottom, 3:Left, then pair 4:Top, 5:Right...
+        const positions = [-Math.PI/2, 0, Math.PI/2, Math.PI];
+        const group = n % 4; // Which quadrant?
+        const isPairing = n >= 4; // Is this the second electron of the pair?
+        const hasPair = total > (group + 4); // Is there a partner for this group in the current config?
+        
+        let baseAngle = positions[group];
+        const offset = 0.25; // Separation for pairs
+        
+        if (hasPair || isPairing) {
+            // If it's a pair, offset them
+            angle = baseAngle + (isPairing ? offset : -offset);
+        } else {
+            // Single electron in this quadrant
+            angle = baseAngle;
+        }
+    }
+    return {
+        x: cx + r * Math.cos(angle),
+        y: cy + r * Math.sin(angle)
+    };
+  };
+
   // --- RENDERERS ---
   const renderShells = (cx: number, cy: number, config: number[], isIon: boolean, type: 'METAL' | 'NONMETAL') => {
-    // Determine current electron count based on stage
-    // For metal: loses electrons. For non-metal: gains.
-    let displayConfig = [...config];
-    
-    // During TRANSFER, we draw static inner shells, and animate the outer electrons
+    // For metal ion, we don't draw the emptied outer shell (visual preference)
     const outerShellIndex = config.length - 1;
     
     return (
@@ -76,57 +109,45 @@ const IonFormationSim: React.FC = () => {
         {/* Shells */}
         {config.map((count, shellIdx) => {
           const r = 25 + (shellIdx * 15);
-          // Don't draw empty outer shell for metal ion
+          
+          // Hide empty outer shell for metal ion
           if (isIon && type === 'METAL' && shellIdx === outerShellIndex) return null;
 
+          // Determine how many electrons to draw in THIS shell
+          // For Metal during transfer: it still has them, but they are animating away.
+          // For NonMetal during transfer: it has its original count.
+          
           return (
             <g key={shellIdx}>
               <circle cx={cx} cy={cy} r={r} fill="none" stroke="#cbd5e1" strokeWidth="1" />
+              
               {/* Electrons */}
               {Array.from({ length: count }).map((_, eIdx) => {
-                // Calculate position on circle
-                const angle = (eIdx / count) * 2 * Math.PI - (Math.PI / 2);
-                const ex = cx + r * Math.cos(angle);
-                const ey = cy + r * Math.sin(angle);
+                
+                const pos = getElectronPos(eIdx, count, r, shellIdx, cx, cy);
+                let ex = pos.x;
+                let ey = pos.y;
 
-                // Handle Transfer Animation
+                // HANDLE TRANSFER ANIMATION (Metal loses electrons)
                 if (stage === 'TRANSFER' && shellIdx === outerShellIndex && type === 'METAL') {
-                   // These are the electrons moving away
-                   // Target is the outer shell of the Non-Metal
-                   // Non-Metal position (cx is approx 350 for non-metal, 150 for metal)
-                   
-                   // Determine target slot on non-metal outer shell
-                   // Non-metal config is e.g. [2, 8, 7]. Target is index 2.
+                   // Target Non-Metal Geometry
                    const targetShellIdx = data.nonMetal.config.length - 1;
                    const targetR = 25 + (targetShellIdx * 15);
+                   const nmCx = 350; // NonMetal Center X
+                   const nmCy = 150; // NonMetal Center Y
                    
-                   // We need to map the eIdx of metal electron to an empty slot on non-metal
-                   // Non-metal has `data.nonMetal.config[targetShellIdx]` electrons already.
-                   // Slot index = existing + eIdx
-                   const existing = data.nonMetal.config[targetShellIdx];
-                   const totalSlots = existing + data.electronsToTransfer; // Should fill the shell (usually 8)
-                   const slotIdx = existing + eIdx;
-                   const targetAngle = (slotIdx / totalSlots) * 2 * Math.PI - (Math.PI / 2); // Simplified distribution
+                   // Calculate destination slot on non-metal
+                   const existingNM = data.nonMetal.config[targetShellIdx]; // e.g. 7
+                   const totalNM = existingNM + data.electronsToTransfer; // e.g. 8
+                   const slotIdx = existingNM + eIdx; // Next available slots
                    
-                   const targetX = 350 + targetR * Math.cos(targetAngle); // 350 is NonMetal CX
-                   const targetY = 150 + targetR * Math.sin(targetAngle); // 150 is CY
+                   const targetPos = getElectronPos(slotIdx, totalNM, targetR, targetShellIdx, nmCx, nmCy);
 
-                   const currX = ex + (targetX - ex) * (animFrame / 100);
-                   const currY = ey + (targetY - ey) * (animFrame / 100);
+                   // Interpolate position
+                   ex = ex + (targetPos.x - ex) * (animFrame / 100);
+                   ey = ey + (targetPos.y - ey) * (animFrame / 100);
 
-                   return <circle key={eIdx} cx={currX} cy={currY} r={4} fill="#ef4444" />;
-                }
-
-                if (stage === 'IONS' && type === 'NONMETAL' && shellIdx === config.length - 1) {
-                    // Draw the gained electrons in Red
-                    // The original electrons are count - transferred
-                    // The new electrons are the last 'transferred' ones
-                    const originalCount = data.nonMetal.config[shellIdx]; // e.g. 7
-                    const finalCount = originalCount + data.electronsToTransfer; // e.g. 8
-                    
-                    // We need to render the full 8, but color the last ones red
-                    // This loop renders 'count' which is the ORIGINAL config for non-metal passed into func
-                    // Wait, we need to handle the 'Ion' state config logic outside or override here
+                   return <circle key={eIdx} cx={ex} cy={ey} r={4} fill="#ef4444" />; // Red for moving electron
                 }
 
                 return <circle key={eIdx} cx={ex} cy={ey} r={3} fill="#3b82f6" />;
@@ -135,18 +156,20 @@ const IonFormationSim: React.FC = () => {
           );
         })}
         
-        {/* Draw Gained Electrons on Non-Metal manually if needed for IONS state */}
+        {/* Draw GAINED electrons on Non-Metal (IONS stage) */}
         {stage === 'IONS' && type === 'NONMETAL' && (
              <g>
                  {Array.from({ length: data.electronsToTransfer }).map((_, i) => {
                      const shellIdx = data.nonMetal.config.length - 1;
                      const r = 25 + (shellIdx * 15);
-                     // Position them in the "gap" visually? 
-                     // Simplified: Just draw them at specific angles for standard octets
-                     const angle = ((data.nonMetal.config[shellIdx] + i) / 8) * 2 * Math.PI - (Math.PI / 2);
-                     const ex = cx + r * Math.cos(angle);
-                     const ey = cy + r * Math.sin(angle);
-                     return <circle key={`new-${i}`} cx={ex} cy={ey} r={4} fill="#ef4444" />;
+                     
+                     const existing = data.nonMetal.config[shellIdx];
+                     const total = existing + data.electronsToTransfer;
+                     const n = existing + i; // The index of the new electron
+
+                     const pos = getElectronPos(n, total, r, shellIdx, cx, cy);
+                     
+                     return <circle key={`new-${i}`} cx={pos.x} cy={pos.y} r={4} fill="#ef4444" />;
                  })}
              </g>
         )}
@@ -165,7 +188,7 @@ const IonFormationSim: React.FC = () => {
   };
 
   return (
-    <div className="my-8 bg-white rounded-3xl border-4 border-indigo-50 shadow-xl overflow-hidden select-none">
+    <div className="my-8 bg-white rounded-3xl border-4 border-indigo-50 shadow-xl overflow-hidden select-none relative z-20">
       
       {/* Header */}
       <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -231,7 +254,7 @@ const IonFormationSim: React.FC = () => {
               </svg>
           </div>
 
-          <div className="flex flex-col items-center gap-4 w-full max-w-lg">
+          <div className="flex flex-col items-center gap-4 w-full max-w-lg relative z-30">
               
               <div className="flex justify-between w-full text-sm font-bold text-slate-500 uppercase tracking-wider px-8">
                   <div className={stage === 'IONS' ? 'text-blue-600' : ''}>

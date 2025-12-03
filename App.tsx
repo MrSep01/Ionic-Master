@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Ion, IonType, Challenge, GameState, DifficultyLevel, LEVEL_ORDER, HistoryEntry, GameMode, TrainingConfig, LessonProgressData } from './types';
+import { Ion, IonType, Challenge, GameState, DifficultyLevel, LEVEL_ORDER, HistoryEntry, GameMode, TrainingConfig } from './types';
 import { CATIONS, ANIONS, LEVEL_CONFIG, WINS_TO_ADVANCE } from './constants';
 import * as GeminiService from './services/gemini';
 import * as StorageService from './services/storage';
@@ -67,8 +67,7 @@ const App: React.FC = () => {
         notes: '',
         history: [],
         certificates: [],
-        completedLessons: [],
-        lessonProgress: {}
+        completedLessons: []
     };
 
     if (saved) {
@@ -78,8 +77,7 @@ const App: React.FC = () => {
             level: LEVEL_ORDER.includes(saved.level) ? saved.level : DifficultyLevel.NOVICE,
             history: saved.history || [],
             certificates: saved.certificates || [],
-            completedLessons: saved.completedLessons || [],
-            lessonProgress: saved.lessonProgress || {}
+            completedLessons: saved.completedLessons || []
         };
     }
     return baseState;
@@ -94,10 +92,11 @@ const App: React.FC = () => {
   const [completedLevel, setCompletedLevel] = useState<DifficultyLevel | null>(null);
   const [hasSeenTutorial, setHasSeenTutorial] = useState(false);
 
-  // --- Auto-Save Effect ---
-  // Saves on any state change to ensure lesson progress and game progress are persisted
+  // --- Auto-Save Effect (Only in Career Mode) ---
   useEffect(() => {
-      StorageService.saveProgress(gameState, hasSeenTutorial);
+      if (gameState.gameMode === GameMode.CAREER) {
+          StorageService.saveProgress(gameState, hasSeenTutorial);
+      }
   }, [gameState, hasSeenTutorial]);
 
   // --- Game Logic ---
@@ -325,8 +324,7 @@ const App: React.FC = () => {
         notes: '',
         history: [],
         certificates: [],
-        completedLessons: [],
-        lessonProgress: {}
+        completedLessons: []
     });
     setHasSeenTutorial(false);
     setShowSettings(false);
@@ -538,16 +536,6 @@ const App: React.FC = () => {
       }
   };
 
-  const handleUpdateLessonProgress = (lessonId: string, data: LessonProgressData) => {
-      setGameState(prev => ({
-          ...prev,
-          lessonProgress: {
-              ...prev.lessonProgress,
-              [lessonId]: data
-          }
-      }));
-  };
-
   // --- PORTAL VIEW ---
   if (viewState === 'PORTAL') {
       return (
@@ -570,9 +558,7 @@ const App: React.FC = () => {
             onExit={() => setViewState('PORTAL')}
             onLaunchSimulation={() => setViewState('GAME')}
             completedLessons={gameState.completedLessons}
-            lessonProgress={gameState.lessonProgress}
             onLessonComplete={handleLessonComplete}
-            onUpdateLessonProgress={handleUpdateLessonProgress}
         />
       );
   }

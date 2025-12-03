@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { Unit, Topic, Lesson, QuizQuestion } from '../../portal/types';
-import { LessonProgressData } from '../../types';
 import LessonPage from './LessonPage';
 import { BookOpen, CheckCircle, ChevronRight, Menu, X, Play, BrainCircuit, FileText } from 'lucide-react';
 
@@ -10,14 +9,12 @@ interface UnitViewerProps {
   onExit: () => void;
   onLaunchSimulation: () => void;
   completedLessons: string[];
-  lessonProgress: Record<string, LessonProgressData>;
   onLessonComplete: (lessonId: string) => void;
-  onUpdateLessonProgress: (lessonId: string, data: LessonProgressData) => void;
 }
 
 type ViewMode = { type: 'LESSON', lessonId: string } | { type: 'QUIZ', topicId: string } | { type: 'MOCK' };
 
-const UnitViewer: React.FC<UnitViewerProps> = ({ unit, onExit, onLaunchSimulation, completedLessons, lessonProgress, onLessonComplete, onUpdateLessonProgress }) => {
+const UnitViewer: React.FC<UnitViewerProps> = ({ unit, onExit, onLaunchSimulation, completedLessons, onLessonComplete }) => {
   const [currentView, setCurrentView] = useState<ViewMode>({ 
       type: 'LESSON', 
       lessonId: unit.topics[0].lessons[0].id 
@@ -96,17 +93,18 @@ const UnitViewer: React.FC<UnitViewerProps> = ({ unit, onExit, onLaunchSimulatio
     <div className="fixed inset-0 bg-white z-50 flex flex-col md:flex-row font-sans text-slate-900">
       
       {/* Mobile Header */}
-      <div className="md:hidden p-4 border-b border-slate-200 flex justify-between items-center bg-white">
-         <button onClick={() => setShowSidebar(!showSidebar)} className="p-2 text-slate-600">
+      <div className="md:hidden p-4 border-b border-slate-200 flex justify-between items-center bg-white relative z-50">
+         <button onClick={() => setShowSidebar(!showSidebar)} className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg">
              <Menu className="w-6 h-6" />
          </button>
          <span className="font-bold text-sm truncate max-w-[200px]">{unit.title}</span>
-         <button onClick={onExit} className="text-xs font-bold text-slate-400 uppercase">Exit</button>
+         <button onClick={onExit} className="text-xs font-bold text-slate-400 uppercase hover:text-slate-600">Exit</button>
       </div>
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-0 md:relative z-40 bg-slate-50 border-r border-slate-200 w-full md:w-80 flex flex-col transition-transform duration-300
+        fixed inset-0 z-40 bg-slate-50 border-r border-slate-200 w-full flex flex-col transition-transform duration-300
+        md:relative md:inset-auto md:w-80 md:z-auto
         ${showSidebar ? 'translate-x-0' : '-translate-x-full md:translate-x-0 md:w-0 md:overflow-hidden'}
       `}>
           <div className="p-6 border-b border-slate-200">
@@ -115,7 +113,13 @@ const UnitViewer: React.FC<UnitViewerProps> = ({ unit, onExit, onLaunchSimulatio
                     <h2 className="text-xs font-black text-indigo-500 uppercase tracking-widest mb-2">Edexcel IGCSE</h2>
                     <h1 className="font-black text-slate-800 text-xl leading-tight">{unit.title}</h1>
                   </div>
-                  <button onClick={onExit} className="md:hidden p-2 bg-white rounded-full shadow-sm"><X className="w-4 h-4" /></button>
+                  {/* Close Sidebar Button (Mobile Only) */}
+                  <button 
+                    onClick={() => setShowSidebar(false)} 
+                    className="md:hidden p-2 bg-white rounded-full shadow-sm hover:bg-slate-100"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
               </div>
               
               {/* Unit Progress */}
@@ -137,6 +141,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({ unit, onExit, onLaunchSimulatio
                       <div className="space-y-1">
                           {topic.lessons.map(lesson => {
                               const isComplete = completedLessons.includes(lesson.id);
+                              const isActive = currentView.type === 'LESSON' && currentView.lessonId === lesson.id;
                               return (
                                   <button
                                     key={lesson.id}
@@ -145,16 +150,16 @@ const UnitViewer: React.FC<UnitViewerProps> = ({ unit, onExit, onLaunchSimulatio
                                         if (window.innerWidth < 768) setShowSidebar(false);
                                     }}
                                     className={`w-full text-left px-3 py-2 rounded-lg text-sm font-bold flex items-center justify-between gap-3 transition-colors ${
-                                        currentView.type === 'LESSON' && currentView.lessonId === lesson.id
+                                        isActive
                                         ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200'
                                         : 'text-slate-600 hover:bg-white hover:shadow-sm'
                                     }`}
                                   >
                                       <div className="flex items-center gap-3 overflow-hidden">
-                                          {currentView.type === 'LESSON' && currentView.lessonId === lesson.id ? <Play className="w-3 h-3 fill-current shrink-0" /> : <FileText className="w-3 h-3 opacity-50 shrink-0" />}
+                                          {isActive ? <Play className="w-3 h-3 fill-current shrink-0" /> : <FileText className="w-3 h-3 opacity-50 shrink-0" />}
                                           <span className="truncate">{lesson.title}</span>
                                       </div>
-                                      {isComplete && <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />}
+                                      {isComplete && <CheckCircle className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-emerald-400'}`} />}
                                   </button>
                               );
                           })}
@@ -209,13 +214,12 @@ const UnitViewer: React.FC<UnitViewerProps> = ({ unit, onExit, onLaunchSimulatio
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-y-auto bg-white relative">
+      <div className="flex-1 overflow-y-auto bg-white relative z-0">
           <div className="w-full h-full p-4 md:p-8 lg:p-12">
                {currentView.type === 'LESSON' && getCurrentLesson() && (
                    <LessonPage 
-                        lesson={getCurrentLesson()!}
-                        initialData={lessonProgress[getCurrentLesson()!.id]}
-                        onSave={(data) => onUpdateLessonProgress(getCurrentLesson()!.id, data)}
+                        key={currentView.lessonId} // Forces remount and state reset when lesson changes
+                        lesson={getCurrentLesson()!} 
                         onLaunchSimulation={onLaunchSimulation}
                         onComplete={onLessonComplete}
                         onNext={handleNextLesson}

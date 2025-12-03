@@ -62,12 +62,6 @@ export interface CertificateEntry {
   timestamp: number;
 }
 
-export interface LessonProgressData {
-  selections: Record<number, number>;
-  textAnswers: Record<number, string>;
-  validatedInputs: Record<number, boolean>;
-}
-
 export interface GameState {
   nickname?: string; // Student Name
   gameMode: GameMode;
@@ -90,7 +84,6 @@ export interface GameState {
   history: HistoryEntry[]; // Log of synthesized compounds
   certificates: CertificateEntry[]; // Earned certificates
   completedLessons: string[]; // IDs of completed curriculum lessons
-  lessonProgress: Record<string, LessonProgressData>; // Granular progress per lesson
 }
 
 // New types for the UI
