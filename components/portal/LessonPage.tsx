@@ -17,6 +17,7 @@ import FiltrationSim from './simulations/FiltrationSim';
 import ChromatographySim from './simulations/ChromatographySim';
 import IonFormationSim from './simulations/IonFormationSim';
 import OxyanionBuilderSim from './simulations/OxyanionBuilderSim';
+import IonicLatticeSim from './simulations/IonicLatticeSim';
 import { saveLessonProgress, getLessonProgress } from '../../services/storage';
 
 interface LessonPageProps {
@@ -451,6 +452,7 @@ const LessonPage: React.FC<LessonPageProps> = ({ lesson, onLaunchSimulation, onC
               if (block.simulationId === 'chromatography-rf') return <SimWrapper key={idx}><ChromatographySim mode="RF" /></SimWrapper>;
               if (block.simulationId === 'ion-formation') return <SimWrapper key={idx}><IonFormationSim /></SimWrapper>;
               if (block.simulationId === 'oxyanion-builder') return <SimWrapper key={idx}><OxyanionBuilderSim /></SimWrapper>;
+              if (block.simulationId === 'ionic-lattice') return <SimWrapper key={idx}><IonicLatticeSim /></SimWrapper>;
 
               // Default / IonicMaster simulation launcher
               return (

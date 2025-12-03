@@ -1,5 +1,6 @@
 
 
+
 import { Unit } from './types';
 
 export const IGCSE_UNIT_5: Unit = {
@@ -1124,43 +1125,111 @@ export const IGCSE_UNIT_5: Unit = {
         },
         {
           id: '5.5-ionic-bond-def',
-          title: '5.5: The Ionic Bond',
+          title: '5.5: The Giant Ionic Lattice',
           blocks: [
             { 
                 type: 'learning-objectives', 
-                items: ['5.5 understand ionic bonding in terms of electrostatic attractions']
+                items: [
+                    '5.5 understand ionic bonding in terms of electrostatic attractions',
+                    '5.6 understand why compounds with giant ionic lattices have high melting and boiling points',
+                    'Explain the physical properties of ionic compounds (Brittleness, Solubility)'
+                ]
             },
-            { type: 'paragraph', content: 'The definition of an ionic bond is precise.' },
+            
+            // --- DEFINITION ---
+            { type: 'header', content: '1. The True Nature of the Bond' },
+            { type: 'paragraph', content: 'Students often think an ionic bond is a stick connecting two ions. This is wrong. An ionic bond is a **field of force** that acts in all directions.' },
             { type: 'key-vocab', vocabItems: [
-                { term: 'Ionic Bond', definition: 'The strong electrostatic attraction between oppositely charged ions.' }
+                { term: 'Ionic Bond', definition: 'The strong electrostatic attraction between oppositely charged ions.' },
+                { term: 'Electrostatic Force', definition: 'The force of attraction between positive (+) and negative (-) charges.' },
+                { term: 'Non-Directional', definition: 'The force pulls equally in all directions (360°), not just towards one specific atom.' }
             ]},
-            { type: 'checkpoint', checkpoint: {
-                question: 'What forces hold ionic compounds together?',
-                options: ['Magnetic forces', 'Electrostatic forces', 'Gravitational forces', 'Intermolecular forces'],
-                correctIndex: 1,
-                explanation: 'Electrostatic forces act between positive and negative charges.'
-            }}
-          ]
-        },
-        {
-          id: '5.6-giant-lattices',
-          title: '5.6: Giant Ionic Lattices',
-          blocks: [
-            { 
-                type: 'learning-objectives', 
-                items: ['5.6 understand why compounds with giant ionic lattices have high melting and boiling points']
-            },
-            { type: 'paragraph', content: 'Ionic compounds form giant 3D lattice structures. Every positive ion is surrounded by negative ions, and vice versa.' },
+
+            // --- GIANT LATTICE ---
+            { type: 'header', content: '2. The Giant Lattice Structure' },
+            { type: 'paragraph', content: 'Because the force is non-directional, ions pack together in a huge, regular 3D arrangement called a **Giant Ionic Lattice**. There are no individual molecules.' },
             { type: 'list', items: [
-                'There are **many strong electrostatic bonds** in all directions.',
-                'A **large amount of energy** is required to overcome these forces.',
-                'Therefore, they have **high melting and boiling points**.'
+                'Every positive ion is surrounded by negative ions.',
+                'Every negative ion is surrounded by positive ions.',
+                'Example: In NaCl, each Na⁺ is surrounded by 6 Cl⁻ ions, and vice versa.'
             ]},
+
+            // --- INTERACTIVE SIMULATION (NEW) ---
+            { type: 'header', content: 'Interactive Lab: Structure & Properties' },
+            { type: 'paragraph', content: 'Use the tabs below to explore the structure. Then, perform destructive tests (Hammer & Heat) to understand the physical properties.' },
+            { type: 'simulation', simulationId: 'ionic-lattice' },
+
+            // --- PHYSICAL PROPERTIES ---
+            { type: 'header', content: '3. Physical Properties Explained' },
+            
+            // Melting Point
+            { type: 'paragraph', content: '**A. High Melting & Boiling Points:**' },
+            { type: 'list', items: [
+                '**Observation:** Ionic salts are solids at room temperature (e.g. Salt melts at 801°C).',
+                '**Explanation:** The electrostatic forces holding the lattice together are extremely strong. It takes a huge amount of heat energy to break the millions of bonds in the giant lattice.'
+            ]},
+
+            // Brittleness
+            { type: 'paragraph', content: '**B. Brittleness (Why they shatter):**' },
+            { type: 'list', items: [
+                '**Observation:** If you hit a crystal with a hammer, it shatters into powder. It does not bend like metal.',
+                '**Explanation:** The force shifts a layer of ions. This brings ions of the **same charge** next to each other (e.g. + next to +).',
+                '**Result:** Massive electrostatic **repulsion** pushes the layers apart, splitting the crystal.'
+            ]},
+
+            // Conductivity (Bridge to 5.7)
+            { type: 'paragraph', content: '**C. Electrical Conductivity:**' },
+            { type: 'list', items: [
+                '**Solid:** Does NOT conduct. Ions are locked in place.',
+                '**Molten/Dissolved:** DOES conduct. The lattice is broken, so ions are free to move and carry charge.'
+            ]},
+
+            // --- LATTICE ENERGY (Advanced) ---
+            { type: 'header', content: '4. Strength of the Lattice (Coulomb\'s Law)' },
+            { type: 'paragraph', content: 'Not all ionic bonds are equal. The strength depends on two factors:' },
+            { type: 'list', items: [
+                '**Charge:** Higher charges = Stronger attraction. (Mg²⁺O²⁻ is much stronger than Na⁺Cl⁻).',
+                '**Size:** Smaller ions = Closer packing = Stronger attraction.'
+            ]},
+            { type: 'exam-hint', content: 'Magnesium Oxide (MgO) has a melting point of 2852°C, while Sodium Chloride (NaCl) is only 801°C. Why? Because Mg²⁺ and O²⁻ have double the charge of Na⁺ and Cl⁻.' },
+
+            // --- CHECKPOINTS ---
+            { type: 'header', content: 'Knowledge Checkpoint' },
+
+            { type: 'checkpoint', checkpoint: {
+                question: 'Why do ionic crystals shatter when hit?',
+                options: [
+                    'They are too soft',
+                    'The layers of ions slide over each other smoothly',
+                    'Like charges align (+ next to +) causing repulsion',
+                    'The electrons fall out'
+                ],
+                correctIndex: 2,
+                explanation: 'A sharp blow shifts the lattice layers. Repulsion between aligned like charges pushes the crystal apart.'
+            }},
             { type: 'checkpoint', checkpoint: {
                 question: 'Which compound would have the highest melting point?',
-                options: ['NaCl (+1/-1)', 'MgO (+2/-2)', 'KBr (+1/-1)', 'LiF (+1/-1)'],
+                options: ['NaCl (1+, 1-)', 'KBr (1+, 1-)', 'MgO (2+, 2-)', 'LiF (1+, 1-)'],
+                correctIndex: 2,
+                explanation: 'Higher charges create significantly stronger electrostatic attraction. 2+ attracting 2- is roughly 4x stronger than 1+ attracting 1-.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'What holds the giant ionic lattice together?',
+                options: ['Gravity', 'Shared electrons', 'Strong electrostatic forces acting in all directions', 'Weak intermolecular forces'],
+                correctIndex: 2,
+                explanation: 'The lattice is held by the non-directional electrostatic attraction between the vast number of oppositely charged ions.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'In a NaCl lattice, how many Chloride ions surround each Sodium ion?',
+                options: ['1', '4', '6', '8'],
+                correctIndex: 2,
+                explanation: 'In the cubic structure of NaCl, each ion is surrounded by 6 neighbors of the opposite charge (Top, Bottom, Left, Right, Front, Back).'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'Why does solid NaCl not conduct electricity?',
+                options: ['It contains no charged particles', 'The ions are fixed in position', 'It is a metal', 'It has too much energy'],
                 correctIndex: 1,
-                explanation: 'MgO has ions with 2+ and 2- charges. The electrostatic attraction is stronger than in 1+/1- compounds, so more energy is needed to break the lattice.'
+                explanation: 'Conductivity requires FREE moving charge carriers. In a solid lattice, the ions are vibrating but trapped in place.'
             }}
           ]
         },
@@ -1307,7 +1376,7 @@ export const IGCSE_UNIT_5: Unit = {
                 type: 'learning-objectives', 
                 items: ['5.15 know that covalent compounds do not usually conduct electricity']
             },
-            { type: 'paragraph', content: 'Most covalent compounds do not conduct electricity because they have no charged particles (ions) and no delocalised electrons that are free to move.' },
+            { type: 'paragraph', content: 'Most covalent compounds do not conduct electricity because they have no charged particles (ions or electrons) that are free to move.' },
             { type: 'paragraph', content: 'Graphite is a notable exception.' }
           ]
         }
