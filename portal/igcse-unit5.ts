@@ -1,12 +1,14 @@
 
 
 
+
+
 import { Unit } from './types';
 
 export const IGCSE_UNIT_5: Unit = {
   id: 'igcse-topic-5',
   title: 'Unit 2: Principles of Chemistry (Part 2)',
-  description: 'Advanced bonding concepts including Ionic, Covalent, Metallic bonding and Electrolysis. (Spec Section 5)',
+  description: 'Advanced bonding concepts including Ionic, Covalent, and Metallic bonding and Electrolysis. (Spec Section 5)',
   topics: [
     // --- SECTION 5: PRINCIPLES OF CHEMISTRY PART 2 ---
     {
@@ -139,7 +141,7 @@ export const IGCSE_UNIT_5: Unit = {
 
             // --- THE IONIC BOND ---
             { type: 'header', content: '6. The Ionic Bond Definition' },
-            { type: 'paragraph', content: 'Once ions are formed, they attract each other. This is NOT a physical stick connecting two balls. It is a field of force.' },
+            { type: 'paragraph', content: 'Once ions are formed, they attract each other. This is NOT a physical stick connecting two ions. It is a field of force.' },
             { type: 'key-vocab', vocabItems: [
                 { term: 'Ionic Bond', definition: 'The strong electrostatic attraction between oppositely charged ions.' },
                 { term: 'Lattice', definition: 'A regular repeating arrangement of ions in 3D space.' }
@@ -1125,14 +1127,14 @@ export const IGCSE_UNIT_5: Unit = {
         },
         {
           id: '5.5-ionic-bond-def',
-          title: '5.5: The Giant Ionic Lattice',
+          title: '5.5: The Nature of the Ionic Bond',
           blocks: [
             { 
                 type: 'learning-objectives', 
                 items: [
                     '5.5 understand ionic bonding in terms of electrostatic attractions',
-                    '5.6 understand why compounds with giant ionic lattices have high melting and boiling points',
-                    'Explain the physical properties of ionic compounds (Brittleness, Solubility)'
+                    'Explain the non-directional nature of the ionic bond',
+                    'Describe the Giant Ionic Lattice structure'
                 ]
             },
             
@@ -1154,13 +1156,44 @@ export const IGCSE_UNIT_5: Unit = {
                 'Example: In NaCl, each Na⁺ is surrounded by 6 Cl⁻ ions, and vice versa.'
             ]},
 
-            // --- INTERACTIVE SIMULATION (NEW) ---
-            { type: 'header', content: 'Interactive Lab: Structure & Properties' },
-            { type: 'paragraph', content: 'Use the tabs below to explore the structure. Then, perform destructive tests (Hammer & Heat) to understand the physical properties.' },
-            { type: 'simulation', simulationId: 'ionic-lattice' },
+            // --- CHECKPOINTS ---
+            { type: 'header', content: 'Knowledge Checkpoint' },
+
+            { type: 'checkpoint', checkpoint: {
+                question: 'Which phrase best defines an Ionic Bond?',
+                options: ['Sharing of electron pairs', 'Attraction between nuclei', 'Strong electrostatic attraction between opposite ions', 'Weak intermolecular forces'],
+                correctIndex: 2,
+                explanation: 'This is the standard definition you must write in exams. "Electrostatic" means attraction between static charges (+ and -).'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'What holds the giant ionic lattice together?',
+                options: ['Gravity', 'Shared electrons', 'Strong electrostatic forces acting in all directions', 'Weak intermolecular forces'],
+                correctIndex: 2,
+                explanation: 'The lattice is held by the non-directional electrostatic attraction between the vast number of oppositely charged ions.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'In a NaCl lattice, how many Chloride ions surround each Sodium ion?',
+                options: ['1', '4', '6', '8'],
+                correctIndex: 2,
+                explanation: 'In the cubic structure of NaCl, each ion is surrounded by 6 neighbors of the opposite charge (Top, Bottom, Left, Right, Front, Back).'
+            }}
+          ]
+        },
+        {
+          id: '5.6-ionic-properties',
+          title: '5.6: Physical Properties of Ionic Compounds',
+          blocks: [
+            { 
+                type: 'learning-objectives', 
+                items: [
+                    '5.6 understand why compounds with giant ionic lattices have high melting and boiling points',
+                    'Explain the physical properties of ionic compounds (Brittleness, Solubility)',
+                    'Compare lattice energies based on ion charge and size'
+                ]
+            },
 
             // --- PHYSICAL PROPERTIES ---
-            { type: 'header', content: '3. Physical Properties Explained' },
+            { type: 'header', content: '1. Physical Properties Explained' },
             
             // Melting Point
             { type: 'paragraph', content: '**A. High Melting & Boiling Points:**' },
@@ -1177,15 +1210,13 @@ export const IGCSE_UNIT_5: Unit = {
                 '**Result:** Massive electrostatic **repulsion** pushes the layers apart, splitting the crystal.'
             ]},
 
-            // Conductivity (Bridge to 5.7)
-            { type: 'paragraph', content: '**C. Electrical Conductivity:**' },
-            { type: 'list', items: [
-                '**Solid:** Does NOT conduct. Ions are locked in place.',
-                '**Molten/Dissolved:** DOES conduct. The lattice is broken, so ions are free to move and carry charge.'
-            ]},
+            // --- INTERACTIVE SIMULATION (NEW) ---
+            { type: 'header', content: 'Interactive Lab: Testing Properties' },
+            { type: 'paragraph', content: 'Use the tabs below to visualize the Structure, and then perform destructive tests (Hammer & Heat) to understand the physical properties.' },
+            { type: 'simulation', simulationId: 'ionic-lattice' },
 
             // --- LATTICE ENERGY (Advanced) ---
-            { type: 'header', content: '4. Strength of the Lattice (Coulomb\'s Law)' },
+            { type: 'header', content: '2. Strength of the Lattice (Coulomb\'s Law)' },
             { type: 'paragraph', content: 'Not all ionic bonds are equal. The strength depends on two factors:' },
             { type: 'list', items: [
                 '**Charge:** Higher charges = Stronger attraction. (Mg²⁺O²⁻ is much stronger than Na⁺Cl⁻).',
@@ -1214,22 +1245,10 @@ export const IGCSE_UNIT_5: Unit = {
                 explanation: 'Higher charges create significantly stronger electrostatic attraction. 2+ attracting 2- is roughly 4x stronger than 1+ attracting 1-.'
             }},
             { type: 'checkpoint', checkpoint: {
-                question: 'What holds the giant ionic lattice together?',
-                options: ['Gravity', 'Shared electrons', 'Strong electrostatic forces acting in all directions', 'Weak intermolecular forces'],
+                question: 'Why do ionic compounds have high melting points?',
+                options: ['Intermolecular forces are weak', 'Covalent bonds are strong', 'Giant lattice structure with strong electrostatic forces', 'They are metals'],
                 correctIndex: 2,
-                explanation: 'The lattice is held by the non-directional electrostatic attraction between the vast number of oppositely charged ions.'
-            }},
-            { type: 'checkpoint', checkpoint: {
-                question: 'In a NaCl lattice, how many Chloride ions surround each Sodium ion?',
-                options: ['1', '4', '6', '8'],
-                correctIndex: 2,
-                explanation: 'In the cubic structure of NaCl, each ion is surrounded by 6 neighbors of the opposite charge (Top, Bottom, Left, Right, Front, Back).'
-            }},
-            { type: 'checkpoint', checkpoint: {
-                question: 'Why does solid NaCl not conduct electricity?',
-                options: ['It contains no charged particles', 'The ions are fixed in position', 'It is a metal', 'It has too much energy'],
-                correctIndex: 1,
-                explanation: 'Conductivity requires FREE moving charge carriers. In a solid lattice, the ions are vibrating but trapped in place.'
+                explanation: 'It takes a lot of energy to break the millions of strong electrostatic bonds in the giant lattice structure.'
             }}
           ]
         },
@@ -1239,17 +1258,56 @@ export const IGCSE_UNIT_5: Unit = {
           blocks: [
             { 
                 type: 'learning-objectives', 
-                items: ['5.7 know that ionic compounds do not conduct electricity when solid, but do conduct electricity when molten and in aqueous solution']
+                items: [
+                    '5.7 know that ionic compounds do not conduct electricity when solid, but do conduct electricity when molten and in aqueous solution'
+                ]
             },
+            
+            // --- INTRODUCTION ---
+            { type: 'header', content: 'The Condition for Conductivity' },
+            { type: 'paragraph', content: 'For a substance to conduct electricity, it must contain **Charged Particles** that are **Free to Move**.' },
+            { type: 'paragraph', content: 'In ionic compounds, these charged particles are the **Ions** themselves (not electrons).' },
+
+            // --- STATES ---
+            { type: 'header', content: 'Conductivity in Different States' },
             { type: 'list', items: [
-                '**Solid:** Ions are fixed in position in the lattice. They cannot move. No conductivity.',
-                '**Molten (Liquid) or Aqueous (Dissolved):** The lattice breaks down. Ions are free to move and carry the electric charge. Conducts electricity.'
+                '**Solid:** Ions are locked in a rigid lattice. They can vibrate, but they cannot move to the electrodes. **Result: Insulator**.',
+                '**Molten (Liquid):** Heat energy breaks the lattice. Ions are free to slide past each other and move to the electrodes. **Result: Conductor**.',
+                '**Aqueous (Dissolved):** Water molecules separate the ions. The ions float freely in the solution. **Result: Conductor**.'
             ]},
+
+            // --- SIMULATION ---
+            { type: 'header', content: 'Interactive Lab: Conductivity Tester' },
+            { type: 'paragraph', content: 'Switch between Solid, Molten, and Solution states. Observe the movement of the ions and whether the light bulb turns on. Pay attention to **why** the current flows.' },
+            { type: 'simulation', simulationId: 'ionic-conductivity' },
+
+            // --- KEYWORDS EXPLAINED ---
+            { type: 'header', content: 'Key Terminology: Molten vs Aqueous' },
+            { type: 'key-vocab', vocabItems: [
+                { term: 'Molten', definition: 'The substance has been melted by HEAT. It is a pure liquid (e.g. liquid NaCl at 801°C). No water is present.' },
+                { term: 'Aqueous', definition: 'The substance has been dissolved in WATER. It is a solution (e.g. Salt water at room temp).' }
+            ]},
+            
+            { type: 'exam-hint', content: '**Exam Requirement:** When explaining why a molten/aqueous ionic compound conducts, you MUST say: "The ions are free to move." Do NOT say "electrons move" (that is for metals).' },
+
+            // --- CHECKPOINTS ---
             { type: 'checkpoint', checkpoint: {
                 question: 'Why does solid Sodium Chloride NOT conduct electricity?',
-                options: ['It has no electrons', 'The ions are not free to move', 'It is a metal', 'It has no charge'],
+                options: ['It has no charged particles', 'The ions are fixed in a lattice and cannot move', 'It is a metal', 'It has no free electrons'],
                 correctIndex: 1,
-                explanation: 'Charged particles (ions) must be mobile to conduct electricity. In a solid, they are locked in place.'
+                explanation: 'The ions exist, but they are locked in position. Conductivity requires MOBILE charge carriers.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'What happens to the ions when an ionic solid melts?',
+                options: ['They become electrons', 'They evaporate', 'The lattice breaks and they become free to move', 'They stop vibrating'],
+                correctIndex: 2,
+                explanation: 'Melting overcomes the strong electrostatic forces holding the lattice together, allowing ions to flow.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'Which of these will conduct electricity?',
+                options: ['Solid NaCl', 'Solid Sugar', 'Aqueous NaCl (Salt Water)', 'Pure Water'],
+                correctIndex: 2,
+                explanation: 'Aqueous NaCl contains dissolved ions that are free to move. Pure water and solid salts are insulators.'
             }}
           ]
         }
