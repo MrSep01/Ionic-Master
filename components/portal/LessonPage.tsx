@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Lesson } from '../../portal/types';
-import { Lightbulb, HelpCircle, Book, FlaskConical, Check, X, AlertCircle, ClipboardList, CheckCircle2, ArrowRight, ArrowLeft, PenTool } from 'lucide-react';
+import { Lightbulb, HelpCircle, Book, FlaskConical, Check, X, AlertCircle, ClipboardList, CheckCircle2, ArrowRight, ArrowLeft, PenTool, Trophy, Target, Award } from 'lucide-react';
 import ParticleStateSim from './simulations/ParticleStateSim';
 import HeatingCurveSim from './simulations/HeatingCurveSim';
 import DiffusionSim from './simulations/DiffusionSim';
@@ -49,6 +49,12 @@ const LessonPage: React.FC<LessonPageProps> = ({ lesson, onLaunchSimulation, onC
   const [validatedInputs, setValidatedInputs] = useState<Record<number, boolean>>(() => getLessonProgress(lesson.id)?.validatedInputs || {});
   
   const [showError, setShowError] = useState(false);
+
+  // Stats Calculation
+  const totalCheckpoints = lesson.blocks.filter(b => b.type === 'checkpoint').length;
+  const correctCount = Object.values(validatedInputs).filter(v => v === true).length;
+  const scorePercentage = totalCheckpoints > 0 ? Math.round((correctCount / totalCheckpoints) * 100) : 0;
+  const isAssessment = lesson.title.toLowerCase().includes('assessment') || lesson.title.toLowerCase().includes('test');
 
   // Auto-Save Effect
   useEffect(() => {
@@ -110,7 +116,7 @@ const LessonPage: React.FC<LessonPageProps> = ({ lesson, onLaunchSimulation, onC
       const totalCheckpoints = checkpoints.length;
       
       if (totalCheckpoints > 0) {
-          let correctCount = 0;
+          let currentCorrect = 0;
           const newValidatedInputs = { ...validatedInputs };
 
           checkpoints.forEach(item => {
@@ -134,23 +140,114 @@ const LessonPage: React.FC<LessonPageProps> = ({ lesson, onLaunchSimulation, onC
                   }
               }
               
-              if (isCorrect) correctCount++;
+              if (isCorrect) currentCorrect++;
           });
 
           setValidatedInputs(newValidatedInputs);
 
-          if (correctCount === totalCheckpoints) {
+          // Force update stats locally to ensure immediate feedback
+          if (currentCorrect === totalCheckpoints) {
               setIsCompleted(true);
               onComplete(lesson.id);
               if (onNext) onNext();
           } else {
               setShowError(true);
+              // Scroll to bottom to see score
+              window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
           }
       } else {
           setIsCompleted(true);
           onComplete(lesson.id);
           if (onNext) onNext();
       }
+  };
+
+  // --- SCORE CARD COMPONENT ---
+  const ScoreCard = () => {
+      if (totalCheckpoints === 0) return null;
+
+      let scoreColor = 'text-indigo-600';
+      let progressColor = 'bg-indigo-500';
+      let bgColor = 'bg-white';
+      let borderColor = 'border-slate-200';
+      
+      if (scorePercentage === 100) {
+          scoreColor = 'text-emerald-600';
+          progressColor = 'bg-emerald-500';
+          bgColor = 'bg-emerald-50';
+          borderColor = 'border-emerald-200';
+      } else if (scorePercentage < 50) {
+          scoreColor = 'text-rose-600';
+          progressColor = 'bg-rose-500';
+          bgColor = 'bg-white';
+          borderColor = 'border-slate-200';
+      } else {
+          scoreColor = 'text-amber-600';
+          progressColor = 'bg-amber-500';
+      }
+
+      return (
+          <div className={`p-6 md:p-8 rounded-3xl border-2 ${borderColor} ${bgColor} shadow-sm mb-8 animate-in fade-in slide-in-from-bottom-4`}>
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                  
+                  {/* Left: Text Info */}
+                  <div className="text-center md:text-left">
+                      <h3 className={`text-sm font-black uppercase tracking-widest mb-1 ${isAssessment ? 'text-slate-500' : 'text-slate-400'}`}>
+                          {isAssessment ? 'Assessment Result' : 'Lesson Score'}
+                      </h3>
+                      <div className="flex items-baseline justify-center md:justify-start gap-2">
+                          <span className={`text-5xl font-black ${scoreColor}`}>
+                              {scorePercentage}%
+                          </span>
+                          <span className="text-slate-400 font-bold text-lg">
+                              ({correctCount}/{totalCheckpoints})
+                          </span>
+                      </div>
+                      <p className="text-slate-500 font-medium text-sm mt-2">
+                          {scorePercentage === 100 ? 'Perfect! You have mastered this topic.' : 
+                           scorePercentage >= 70 ? 'Great job! You are doing well.' : 
+                           'Keep practicing. Review the sections above.'}
+                      </p>
+                  </div>
+
+                  {/* Middle: Progress Bar */}
+                  <div className="flex-1 w-full md:max-w-xs">
+                      <div className="h-4 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200 shadow-inner">
+                          <div 
+                            className={`h-full ${progressColor} transition-all duration-1000 ease-out`} 
+                            style={{ width: `${scorePercentage}%` }}
+                          ></div>
+                      </div>
+                      {/* Checkpoint ticks */}
+                      <div className="flex justify-between mt-2 px-1">
+                          {Array.from({length: Math.min(10, totalCheckpoints)}).map((_, i) => (
+                              <div key={i} className={`w-1.5 h-1.5 rounded-full ${i < (scorePercentage/100)*Math.min(10, totalCheckpoints) ? progressColor : 'bg-slate-200'}`}></div>
+                          ))}
+                      </div>
+                  </div>
+
+                  {/* Right: Badge */}
+                  <div className="hidden md:flex flex-col items-center justify-center p-4 bg-white rounded-2xl border border-slate-100 shadow-sm shrink-0 w-32 h-32">
+                      {scorePercentage === 100 ? (
+                          <>
+                              <Trophy className="w-10 h-10 text-yellow-500 mb-2 animate-bounce" />
+                              <span className="text-[10px] font-black text-slate-400 uppercase">Mastery</span>
+                          </>
+                      ) : scorePercentage > 0 ? (
+                          <>
+                              <Target className="w-10 h-10 text-indigo-500 mb-2" />
+                              <span className="text-[10px] font-black text-slate-400 uppercase">In Progress</span>
+                          </>
+                      ) : (
+                          <>
+                              <Award className="w-10 h-10 text-slate-300 mb-2" />
+                              <span className="text-[10px] font-black text-slate-300 uppercase">Start Now</span>
+                          </>
+                      )}
+                  </div>
+              </div>
+          </div>
+      );
   };
 
   return (
@@ -319,7 +416,7 @@ const LessonPage: React.FC<LessonPageProps> = ({ lesson, onLaunchSimulation, onC
                    </div>
                    <div className="p-6 md:p-8">
                        <p className="text-xl font-bold text-slate-800 mb-6 leading-snug">
-                           <span className="text-slate-400 mr-2 text-sm font-black uppercase tracking-widest block mb-1">Question {idx + 1}</span>
+                           {isAssessment && <span className="text-slate-400 mr-2 text-sm font-black uppercase tracking-widest block mb-1">Question {idx + 1}</span>}
                            {block.checkpoint?.question}
                        </p>
                        
@@ -484,34 +581,48 @@ const LessonPage: React.FC<LessonPageProps> = ({ lesson, onLaunchSimulation, onC
           }
         })}
         
-        {/* Completion Area */}
-        <div className="mt-12 p-8 bg-slate-50 rounded-3xl border border-slate-200 text-center animate-in fade-in slide-in-from-bottom-4 max-w-5xl mx-auto">
+        {/* Score Dashboard */}
+        <div className="mt-12 p-4 md:p-8 bg-slate-50 rounded-3xl border border-slate-200 text-center animate-in fade-in slide-in-from-bottom-4 max-w-5xl mx-auto">
+            
+            {/* Render Score Card if there are checkpoints */}
+            <ScoreCard />
+
             {showError && (
                 <div className="mb-6 p-4 bg-rose-100 text-rose-800 rounded-xl font-bold flex items-center justify-center gap-2 animate-bounce">
-                    <AlertCircle className="w-5 h-5" /> Please complete all checkpoints correctly first!
+                    <AlertCircle className="w-5 h-5" /> Incomplete: Please answer all questions correctly to finish.
                 </div>
             )}
-            
-            <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-4">
-                <button 
-                    onClick={onPrev}
-                    className={`px-6 py-4 rounded-2xl font-bold text-slate-500 hover:bg-white hover:shadow-sm hover:text-slate-700 transition-all flex items-center justify-center gap-2 ${!onPrev ? 'invisible pointer-events-none' : ''}`}
-                >
-                    <ArrowLeft className="w-5 h-5" /> Previous Lesson
-                </button>
 
-                <button 
-                    onClick={handleFinish}
-                    className={`w-full md:w-auto px-8 py-4 rounded-2xl font-black text-lg shadow-xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-3
-                        ${isCompleted 
-                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-200' 
-                            : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-200'}
-                    `}
-                >
-                    {isCompleted ? 'Next Lesson' : 'Check All / Finish'} <ArrowRight className="w-5 h-5" />
-                </button>
+            <div className="flex gap-4 justify-center">
+                {onPrev && (
+                    <button 
+                        onClick={onPrev}
+                        className="px-6 py-3 rounded-xl font-bold text-slate-500 hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200 transition-all flex items-center gap-2"
+                    >
+                        <ArrowLeft className="w-4 h-4" /> Previous
+                    </button>
+                )}
+                
+                {!isCompleted ? (
+                    <button 
+                        onClick={handleFinish}
+                        className="px-10 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-black shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 flex items-center gap-3"
+                    >
+                        CHECK ANSWERS
+                    </button>
+                ) : (
+                    onNext && (
+                        <button 
+                            onClick={onNext}
+                            className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white rounded-xl font-black shadow-lg hover:shadow-emerald-200 transition-all hover:-translate-y-1 flex items-center gap-3"
+                        >
+                            NEXT LESSON <ArrowRight className="w-5 h-5" />
+                        </button>
+                    )
+                )}
             </div>
         </div>
+
       </div>
     </div>
   );

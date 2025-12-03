@@ -18,7 +18,7 @@ const SolutionSim: React.FC = () => {
   const [particles, setParticles] = useState<Particle[]>([]);
   
   const containerRef = useRef<HTMLDivElement>(null);
-  const reqRef = useRef<number>();
+  const reqRef = useRef<number | null>(null);
 
   // Initialize Simulation
   const init = () => {

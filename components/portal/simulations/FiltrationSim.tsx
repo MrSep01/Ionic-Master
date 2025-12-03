@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Filter, RotateCcw, ArrowRight, Flame, Droplets } from 'lucide-react';
 
@@ -23,7 +24,7 @@ const FiltrationSim: React.FC = () => {
   const [isHeating, setIsHeating] = useState(true);
   const [steamParticles, setSteamParticles] = useState<{id: number, x: number, y: number, o: number}[]>([]);
 
-  const reqRef = useRef<number>();
+  const reqRef = useRef<number | null>(null);
 
   // --- CONTROLS ---
 

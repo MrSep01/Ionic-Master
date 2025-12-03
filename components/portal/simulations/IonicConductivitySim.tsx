@@ -8,7 +8,7 @@ const IonicConductivitySim: React.FC = () => {
   const [mode, setMode] = useState<StateMode>('SOLID');
   const [ions, setIons] = useState<{id: number, x: number, y: number, type: 'POS' | 'NEG', vx: number, vy: number}[]>([]);
   
-  const reqRef = useRef<number>();
+  const reqRef = useRef<number | null>(null);
 
   // Initialize Particles
   useEffect(() => {

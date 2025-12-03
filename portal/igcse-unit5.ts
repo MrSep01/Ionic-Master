@@ -1,8 +1,4 @@
 
-
-
-
-
 import { Unit } from './types';
 
 export const IGCSE_UNIT_5: Unit = {
@@ -1308,6 +1304,241 @@ export const IGCSE_UNIT_5: Unit = {
                 options: ['Solid NaCl', 'Solid Sugar', 'Aqueous NaCl (Salt Water)', 'Pure Water'],
                 correctIndex: 2,
                 explanation: 'Aqueous NaCl contains dissolved ions that are free to move. Pure water and solid salts are insulators.'
+            }}
+          ]
+        },
+        // --- NEW ASSESSMENT SECTION ---
+        {
+          id: '5.f-assessment',
+          title: '5.F: Comprehensive Assessment (Topic 5F)',
+          blocks: [
+            { type: 'header', content: 'Assessment Instructions' },
+            { type: 'paragraph', content: 'This comprehensive test covers content from Lessons 5.1 to 5.7. It is designed to simulate a full exam paper for this topic.' },
+            { type: 'list', items: [
+                '**Section A:** Fundamentals & Trends (20 Marks)',
+                '**Section B:** Nomenclature & Formulae (30 Marks)',
+                '**Section C:** Bonding & Structure (25 Marks)',
+                '**Section D:** Physical Properties & Application (25 Marks)'
+            ]},
+
+            // --- SECTION A ---
+            { type: 'header', content: 'Section A: Fundamentals & Trends (20 Marks)' },
+            
+            { type: 'checkpoint', checkpoint: {
+                question: 'A1. Which group of elements forms 2+ ions?',
+                options: ['Group 1', 'Group 2', 'Group 6', 'Group 7'],
+                correctIndex: 1,
+                explanation: 'Group 2 metals lose 2 electrons to form 2+ ions.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'A2. What is the electronic configuration of a Fluoride ion (F⁻)? (F is atomic no. 9)',
+                options: ['2.7', '2.8', '2.8.1', '2.6'],
+                correctIndex: 1,
+                explanation: 'Fluorine (2.7) gains 1 electron to become Fluoride (2.8).'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'A3. Which term describes the loss of electrons?',
+                options: ['Reduction', 'Oxidation', 'Redox', 'Displacement'],
+                correctIndex: 1,
+                explanation: 'Oxidation Is Loss (OIL).'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'A4. Which of these ions is isoelectronic with Argon?',
+                options: ['Na⁺', 'O²⁻', 'K⁺', 'Li⁺'],
+                correctIndex: 2,
+                explanation: 'Argon is 2.8.8. Potassium (2.8.8.1) loses 1 electron to become K⁺ (2.8.8).'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'A5. What is the charge of the Sulfite ion?',
+                options: ['-1', '-2', '-3', '+2'],
+                correctIndex: 1,
+                explanation: 'Sulfite (SO₃²⁻) has a -2 charge, same as Sulfate.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'A6. Why do atoms react to form ions?',
+                options: ['To become neutral', 'To gain mass', 'To achieve a full valence electron shell', 'To become radioactive'],
+                correctIndex: 2,
+                explanation: 'Atoms react to achieve the stable electronic configuration of a noble gas.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'A7. What is the formula for the Ammonium ion?',
+                options: ['NH₃', 'NH₄⁺', 'NO₃⁻', 'NH₂⁻'],
+                correctIndex: 1,
+                explanation: 'Ammonium is a polyatomic cation: NH₄⁺.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'A8. Which of these elements forms an anion?',
+                options: ['Calcium', 'Potassium', 'Bromine', 'Iron'],
+                correctIndex: 2,
+                explanation: 'Bromine is a non-metal (Group 7) and gains electrons to form anions.'
+            }},
+
+            // --- SECTION B ---
+            { type: 'header', content: 'Section B: Nomenclature & Formulae (30 Marks)' },
+            { type: 'paragraph', content: 'Type the correct chemical formula. Case insensitive (e.g., Na2O or na2o).' },
+
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: 'B1. Sodium Sulfide',
+                acceptedAnswers: ['Na2S'],
+                explanation: 'Na⁺ and S²⁻. Need two Na.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: 'B2. Magnesium Nitrate',
+                acceptedAnswers: ['Mg(NO3)2'],
+                explanation: 'Mg²⁺ and NO₃⁻. Need two nitrates.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: 'B3. Iron(III) Oxide',
+                acceptedAnswers: ['Fe2O3'],
+                explanation: 'Fe³⁺ and O²⁻. Swap charges: Fe₂O₃.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: 'B4. Aluminum Hydroxide',
+                acceptedAnswers: ['Al(OH)3'],
+                explanation: 'Al³⁺ and OH⁻. Need 3 hydroxides.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: 'B5. Copper(II) Sulfate',
+                acceptedAnswers: ['CuSO4'],
+                explanation: 'Cu²⁺ and SO₄²⁻. Charges cancel.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: 'B6. Ammonium Carbonate',
+                acceptedAnswers: ['(NH4)2CO3'],
+                explanation: 'NH₄⁺ and CO₃²⁻. Need two ammoniums.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: 'B7. Silver Nitrate',
+                acceptedAnswers: ['AgNO3'],
+                explanation: 'Ag⁺ and NO₃⁻.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: 'B8. Zinc Chloride',
+                acceptedAnswers: ['ZnCl2'],
+                explanation: 'Zn is always Zn²⁺. Cl⁻.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: 'B9. Potassium Permanganate',
+                acceptedAnswers: ['KMnO4'],
+                explanation: 'K⁺ and MnO₄⁻.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                variant: 'text-input',
+                question: 'B10. Lead(IV) Oxide',
+                acceptedAnswers: ['PbO2'],
+                explanation: 'Pb⁴⁺ and O²⁻. Pb₂O₄ simplifies to PbO₂.'
+            }},
+
+            // --- SECTION C ---
+            { type: 'header', content: 'Section C: Bonding & Structure (25 Marks)' },
+
+            { type: 'checkpoint', checkpoint: {
+                question: 'C1. What is the definition of an Ionic Bond?',
+                options: [
+                    'Sharing of electrons between non-metals',
+                    'Attraction between delocalised electrons and positive ions',
+                    'Strong electrostatic attraction between oppositely charged ions',
+                    'Weak intermolecular forces between molecules'
+                ],
+                correctIndex: 2,
+                explanation: 'Ionic bonding is the electrostatic attraction between positive and negative ions.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'C2. Which description best fits the structure of Sodium Chloride?',
+                options: [
+                    'Simple molecular lattice',
+                    'Giant ionic lattice',
+                    'Giant covalent structure',
+                    'Metallic lattice'
+                ],
+                correctIndex: 1,
+                explanation: 'Ionic compounds form giant repeating lattices of alternating ions.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'C3. In the formation of Calcium Chloride (CaCl₂), how many electrons are transferred in total per unit?',
+                options: ['1', '2', '3', '4'],
+                correctIndex: 1,
+                explanation: 'One Ca atom loses 2 electrons. Each Cl atom takes 1. Total transferred from metal to non-metal is 2.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'C4. Why is the ionic bond non-directional?',
+                options: [
+                    'Because electrons are shared',
+                    'Because the electrostatic field acts in all directions around the ion',
+                    'Because it only acts between specific pairs',
+                    'Because ions move randomly'
+                ],
+                correctIndex: 1,
+                explanation: 'A charged sphere attracts opposite charges from all angles (360°).'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'C5. What is the coordination number of Sodium in a NaCl lattice (how many neighbors)?',
+                options: ['4', '6', '8', '12'],
+                correctIndex: 1,
+                explanation: 'Each Na⁺ is surrounded by 6 Cl⁻ ions (Top, Bottom, Front, Back, Left, Right).'
+            }},
+
+            // --- SECTION D ---
+            { type: 'header', content: 'Section D: Physical Properties & Application (25 Marks)' },
+
+            { type: 'checkpoint', checkpoint: {
+                question: 'D1. Why do ionic compounds have high melting points?',
+                options: [
+                    'The ions are heavy',
+                    'Covalent bonds are strong',
+                    'Large amounts of energy are needed to overcome strong electrostatic forces',
+                    'They contain metals'
+                ],
+                correctIndex: 2,
+                explanation: 'The lattice is held together by millions of strong bonds. Breaking them requires high energy.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'D2. Which compound has the highest lattice energy (and melting point)?',
+                options: ['NaF', 'MgO', 'KCl', 'CaBr₂'],
+                correctIndex: 1,
+                explanation: 'MgO has ions with charges +2 and -2. Higher charges = Stronger attraction.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'D3. Why are ionic crystals brittle?',
+                options: [
+                    'Layers of ions slide easily',
+                    'Applied force causes like charges to align and repel',
+                    'They are too hard',
+                    'They contain water'
+                ],
+                correctIndex: 1,
+                explanation: 'Shifting the lattice brings ions of the same charge together. Repulsion shatters the crystal.'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'D4. Under what condition does Potassium Bromide conduct electricity?',
+                options: [
+                    'Solid only',
+                    'Solid and Molten',
+                    'Molten and Aqueous',
+                    'Never'
+                ],
+                correctIndex: 2,
+                explanation: 'Ions must be free to move. This happens when melted (molten) or dissolved (aqueous).'
+            }},
+            { type: 'checkpoint', checkpoint: {
+                question: 'D5. In the electrolysis of molten Lead(II) Bromide, what is formed at the Cathode?',
+                options: [
+                    'Bromine gas',
+                    'Lead metal',
+                    'Hydrogen gas',
+                    'Oxygen gas'
+                ],
+                correctIndex: 1,
+                explanation: 'The Cathode is negative. It attracts the positive Lead ion (Pb²⁺), which gains electrons to become Lead metal.'
             }}
           ]
         }

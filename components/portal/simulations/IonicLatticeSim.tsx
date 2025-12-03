@@ -19,7 +19,7 @@ const IonicLatticeSim: React.FC = () => {
   const [particles, setParticles] = useState<{id: number, x: number, y: number, vx: number, vy: number, type: 'POS' | 'NEG'}[]>([]);
 
   // --- ANIMATION REFS ---
-  const reqRef = useRef<number>();
+  const reqRef = useRef<number | null>(null);
 
   const reset = () => {
     setBrittleStage('IDLE');

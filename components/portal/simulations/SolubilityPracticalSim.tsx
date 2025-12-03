@@ -16,7 +16,7 @@ const SolubilityPracticalSim: React.FC = () => {
   const MASS_SOLUTE = 4; // Ammonium Chloride approx
   const CRYSTAL_POINT = 55; // Temp where crystals appear
 
-  const coolingRef = useRef<number>();
+  const coolingRef = useRef<number | null>(null);
 
   const reset = () => {
     setStep(1);
@@ -60,7 +60,7 @@ const SolubilityPracticalSim: React.FC = () => {
           }
 
           if (next <= 20) {
-            clearInterval(coolingRef.current);
+            clearInterval(coolingRef.current!);
             setIsCooling(false);
             return 20;
           }
@@ -68,12 +68,14 @@ const SolubilityPracticalSim: React.FC = () => {
         });
       }, 100);
     }
-    return () => clearInterval(coolingRef.current);
+    return () => {
+        if (coolingRef.current) clearInterval(coolingRef.current);
+    };
   }, [isCooling, crystalsFormed]);
 
   const handleRecord = () => {
     setRecordedTemp(temp);
-    clearInterval(coolingRef.current);
+    if (coolingRef.current) clearInterval(coolingRef.current);
     setIsCooling(false);
     setStep(4);
   };

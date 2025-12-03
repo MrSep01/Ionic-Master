@@ -8,7 +8,7 @@ const DiffusionSim: React.FC = () => {
   const [progress, setProgress] = useState(0); // 0 to 100
   
   // Particle animation ref
-  const requestRef = useRef<number>();
+  const requestRef = useRef<number | null>(null);
 
   // NH3 (Ammonia) Mr = 17
   // HCl (Hydrochloric Acid) Mr = 36.5

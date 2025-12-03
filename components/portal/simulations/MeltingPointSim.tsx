@@ -21,7 +21,7 @@ const MeltingPointSim: React.FC = () => {
   const currentSample = getSampleData(sample);
 
   // Animation Frame
-  const reqRef = useRef<number>();
+  const reqRef = useRef<number | null>(null);
 
   const animate = () => {
       setTemp(prev => {
