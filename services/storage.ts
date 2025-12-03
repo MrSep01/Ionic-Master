@@ -17,6 +17,13 @@ export interface SavedProgress {
   completedLessons?: string[];
 }
 
+export interface LessonProgress {
+  selections: Record<number, number>;
+  textAnswers: Record<number, string>;
+  validatedInputs: Record<number, boolean>;
+  isCompleted: boolean;
+}
+
 export const saveProgress = (state: GameState, hasSeenTutorial: boolean = false) => {
   const dataToSave: SavedProgress = {
     nickname: state.nickname,
@@ -54,5 +61,24 @@ export const clearProgress = () => {
     localStorage.removeItem(STORAGE_KEY);
   } catch (e) {
     console.error('Failed to clear progress', e);
+  }
+};
+
+// --- Lesson Specific Progress ---
+
+export const saveLessonProgress = (lessonId: string, data: LessonProgress) => {
+  try {
+    localStorage.setItem(`ionic_lesson_${lessonId}`, JSON.stringify(data));
+  } catch (e) {
+    console.error('Failed to save lesson progress', e);
+  }
+};
+
+export const getLessonProgress = (lessonId: string): LessonProgress | null => {
+  try {
+    const saved = localStorage.getItem(`ionic_lesson_${lessonId}`);
+    return saved ? JSON.parse(saved) : null;
+  } catch (e) {
+    return null;
   }
 };

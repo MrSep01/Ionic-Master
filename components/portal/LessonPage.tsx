@@ -17,6 +17,7 @@ import FiltrationSim from './simulations/FiltrationSim';
 import ChromatographySim from './simulations/ChromatographySim';
 import IonFormationSim from './simulations/IonFormationSim';
 import OxyanionBuilderSim from './simulations/OxyanionBuilderSim';
+import { saveLessonProgress, getLessonProgress } from '../../services/storage';
 
 interface LessonPageProps {
   lesson: Lesson;
@@ -26,30 +27,36 @@ interface LessonPageProps {
   onPrev?: () => void;
 }
 
+// Wrapper for simulations to ensure consistent styling
+// Defined OUTSIDE the component to prevent re-mounting on every render
+const SimWrapper: React.FC<{children: React.ReactNode}> = ({children}) => (
+    <div className="my-12 w-full max-w-5xl mx-auto">{children}</div>
+);
+
 // Helper: Smart Normalization
 // Removes ALL spaces and converts to lowercase
-// e.g. "Cobalt (II) Carbonate " -> "cobalt(ii)carbonate"
 const normalizeAnswer = (str: string) => {
     return str.replace(/\s+/g, '').toLowerCase().trim();
 };
 
 const LessonPage: React.FC<LessonPageProps> = ({ lesson, onLaunchSimulation, onComplete, onNext, onPrev }) => {
-  const [selections, setSelections] = useState<Record<number, number>>({});
-  const [textAnswers, setTextAnswers] = useState<Record<number, string>>({});
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [showError, setShowError] = useState(false);
+  // Initialize state lazily from storage if available
+  const [selections, setSelections] = useState<Record<number, number>>(() => getLessonProgress(lesson.id)?.selections || {});
+  const [textAnswers, setTextAnswers] = useState<Record<number, string>>(() => getLessonProgress(lesson.id)?.textAnswers || {});
+  const [isCompleted, setIsCompleted] = useState(() => getLessonProgress(lesson.id)?.isCompleted || false);
+  const [validatedInputs, setValidatedInputs] = useState<Record<number, boolean>>(() => getLessonProgress(lesson.id)?.validatedInputs || {});
   
-  // Tracks validation status per question: undefined (not checked), true (correct), false (incorrect)
-  const [validatedInputs, setValidatedInputs] = useState<Record<number, boolean>>({});
+  const [showError, setShowError] = useState(false);
 
-  // Reset state when lesson changes
+  // Auto-Save Effect
   useEffect(() => {
-      setSelections({});
-      setTextAnswers({});
-      setValidatedInputs({});
-      setIsCompleted(false);
-      setShowError(false);
-  }, [lesson.id]);
+      saveLessonProgress(lesson.id, {
+          selections,
+          textAnswers,
+          validatedInputs,
+          isCompleted
+      });
+  }, [selections, textAnswers, validatedInputs, isCompleted, lesson.id]);
 
   const handleSelect = (blockIdx: number, optionIdx: number) => {
     setSelections(prev => ({ ...prev, [blockIdx]: optionIdx }));
@@ -427,10 +434,6 @@ const LessonPage: React.FC<LessonPageProps> = ({ lesson, onLaunchSimulation, onC
               );
 
             case 'simulation':
-              const SimWrapper: React.FC<{children: React.ReactNode}> = ({children}) => (
-                  <div className="my-12 w-full max-w-5xl mx-auto">{children}</div>
-              );
-
               if (block.simulationId === 'particle-model') return <SimWrapper key={idx}><ParticleStateSim /></SimWrapper>;
               if (block.simulationId === 'heating-curve') return <SimWrapper key={idx}><HeatingCurveSim /></SimWrapper>;
               if (block.simulationId === 'diffusion') return <SimWrapper key={idx}><DiffusionSim /></SimWrapper>;
